@@ -7,15 +7,17 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn href="https://github.com/vuetifyjs/vuetify/releases/latest" target="_blank" text>
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      <v-btn large color="info" @click="copy">コピー</v-btn>
     </v-app-bar>
 
     <v-content>
-      <div>
+      <div class="ml-4">
         <table class="calendar">
+          <tr>
+            <td v-for="w in weeks" :key="w">
+              {{ w }}
+            </td>
+          </tr>
           <tr v-for="r in data.rows" :key="r">
             <td v-for="c in r.cells" :key="c">
               <CalendarCell :day="getDay(c)" holidayName="国民の祝日" />
@@ -23,7 +25,6 @@
           </tr>
         </table>
       </div>
-      <v-btn large color="primary" @click="copy">コピー</v-btn>
     </v-content>
   </v-app>
 </template>
@@ -131,7 +132,11 @@ export default class App extends Vue {
   }
 
   public getDay(c: CustomTypes.Cell) {
-    return c.date.getDate();
+    const date = c.date.getDate();
+    if (date == 1) {
+      return c.date.getMonth() + 1 + '/' + date;
+    }
+    return date;
   }
   public copy() {
     var str = 'コピーする文字';
