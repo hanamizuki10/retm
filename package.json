@@ -4,19 +4,28 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "npm run build:vue && npm run build:gas && npm run build:cleanup",
+    "build:vue": "vue-cli-service build",
+    "build:gas": "webpack --progress --config webpack.config.gas.js",
+    "build:cleanup": "rimraf ./dist/js && rimraf ./dist/css",
     "lint": "vue-cli-service lint",
-    "test:unit": "vue-cli-service test:unit"
+    "test:unit": "vue-cli-service test:unit",
+    "push": "clasp push",
+    "open": "clasp open"
   },
   "dependencies": {
+    "@mdi/font": "^3.6.95",
     "core-js": "^3.6.4",
+    "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.2",
-    "vue-property-decorator": "^8.3.0",
+    "vue-property-decorator": "^8.4.1",
     "vue-router": "^3.1.5",
+    "vuetify": "^2.2.11",
     "vuex": "^3.1.2"
   },
   "devDependencies": {
+    "@types/google-apps-script": "^1.0.10",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^2.18.0",
     "@typescript-eslint/parser": "^2.18.0",
@@ -28,11 +37,20 @@
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^5.0.1",
     "@vue/test-utils": "1.0.0-beta.31",
+    "es3ify-webpack-plugin": "^0.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^6.1.2",
+    "gas-webpack-plugin": "^1.0.2",
+    "html-webpack-inline-source-plugin": "0.0.10",
     "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
     "typescript": "~3.7.5",
-    "vue-template-compiler": "^2.6.11"
+    "url-loader": "^3.0.0",
+    "vue-cli-plugin-vuetify": "^2.0.5",
+    "vue-template-compiler": "^2.6.11",
+    "webpack": "^4.42.0",
+    "webpack-cdn-plugin": "^3.2.2",
+    "webpack-cli": "^3.3.11"
   }
 }
