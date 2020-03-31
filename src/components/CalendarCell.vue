@@ -1,37 +1,27 @@
 <template>
   <table>
     <tr>
-      <td>{{ day }}</td>
+      <td>{{ data.date.getDate() }}</td>
       <td></td>
-      <td></td>
-      <td>{{ holidayName }}</td>
+      <td>{{ data.text }}</td>
+      <td>{{ data.holidayName }}</td>
     </tr>
     <tr>
-      <td colspan="4" class="text-align-center">7:30</td>
+      <td colspan="4" class="text-align-center">{{ data.planTime.inputTime }}</td>
     </tr>
-    <tr>
+    <tr v-for="(categoryName, index) in categoryNames" :key="categoryName">
       <td></td>
-      <td>顧</td>
-      <td>4:00</td>
-      <td></td>
-    </tr>
-    <tr>
-      <td></td>
-      <td>A</td>
-      <td>2:00</td>
+      <td>{{ categoryName }}</td>
+      <td>{{ data.categoryTimes[index].inputTime }}</td>
       <td></td>
     </tr>
     <tr>
-      <td></td>
-      <td>他</td>
-      <td>1:00</td>
-      <td></td>
+      <td colspan="3" class="text-align-right">総時間</td>
+      <td>{{ data.totalTime.inputTime }}</td>
     </tr>
     <tr>
-      <td></td>
-      <td></td>
-      <td class="text-align-right">総時間</td>
-      <td>39:04</td>
+      <td colspan="3" class="text-align-right">残時間</td>
+      <td>{{ data.remainingTime.inputTime }}</td>
     </tr>
   </table>
 </template>
@@ -41,8 +31,9 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
 export default class CalendarCell extends Vue {
-  @Prop() private day!: string;
-  @Prop() private holidayName!: string;
+  //@Prop() private data!: CustomTypes.MyDay;
+  @Prop() private data!: any;
+  @Prop() private categoryNames!: String[];
 }
 </script>
 
