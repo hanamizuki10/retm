@@ -9,8 +9,10 @@ module.exports = {
     project: './tsconfig.json'
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    //'no-console': 'error',  // 本番
+    'no-console': 'off',    // 開発
+    //'no-debugger': 'error', // 本番
+    'no-debugger': 'off',   // 開発
     'prettier/prettier': [
       'error',
       {
