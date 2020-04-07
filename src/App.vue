@@ -62,40 +62,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import TempCalendarCell from './components/TempCalendarCell.vue'; // 仮
 import CalendarCell from './components/CalendarCell.vue';
 
-declare namespace CustomTypes {
-  export interface MyMonth {
-    firstDate: Date | null;
-    lastDate: Date | null;
-    weeks: MyWeek[];
-  }
-  export interface MyWeek {
-    days: MyDay[];
-  }
-  export interface MyDay {
-    date: Date;
-    isTarget: Boolean;
-    isCurrent: Boolean;
-    isHoliday: Boolean;
-    holidayName: String;
-    week: String;
-    planTime: MyTime;
-    totalTime: MyTime;
-    remainingTime: MyTime;
-    categoryTimes: MyTime[];
-    text: String;
-  }
-  export interface MyTime {
-    inputTime: String;
-    hours: number;
-    minutes: number;
-  }
-}
 @Component({
   components: {
-    TempCalendarCell,
     CalendarCell
   }
 })
@@ -111,6 +81,18 @@ export default class App extends Vue {
   private categoryNames = ['A', 'M', '他'];
 
   created() {
+    var holidays: GetHolidayResult = {};
+
+    var samplestring = this.$script
+      .getSampleString()
+      .then(function(value) {
+        console.log('console.log', value);
+      })
+      .catch(function(error) {
+        console.error('console.error', error);
+      });
+    console.log(samplestring);
+
     const date = new Date();
     var currentYear = date.getFullYear();
     var currentMonth = date.getMonth() + 1;
@@ -150,6 +132,7 @@ export default class App extends Vue {
       do {
         dt.setDate(this.data.lastDate.getDate() + i);
         this.addData(dt, this.weekStrings[dt.getDay()], false, false);
+        i++;
       } while (dt.getDay() < 6);
     }
   }
@@ -172,11 +155,17 @@ export default class App extends Vue {
       text: 'サンプル'
     };
     this.tempWeek.days.push(item);
-    console.log(dt.toLocaleString(), ' : ', this.weekStrings[dt.getDay()]);
+    console.log(
+      dt.toLocaleString(),
+      ' : ',
+      this.weekStrings[dt.getDay()],
+      'this.data.weeks.push',
+      this.tempWeek.days.length
+    );
     if (this.tempWeek.days.length == 7) {
+      console.log('this.data.weeks.push', this.tempWeek.days.length);
       this.data.weeks.push(this.tempWeek);
       this.tempWeek = { days: [] };
-      console.log('this.data.weeks.push');
     }
   }
 

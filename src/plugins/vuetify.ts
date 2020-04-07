@@ -1,4 +1,4 @@
-import '@fortawesome/fontawesome-free/css/all.css'; // Ensure you are using css-loader
+//import '@fortawesome/fontawesome-free/css/all.css'; // TODO:削除、代用品探す。Ensure you are using css-loader
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
