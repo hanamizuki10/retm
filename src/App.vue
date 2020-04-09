@@ -81,8 +81,7 @@ export default class App extends Vue {
   private categoryNames = ['A', 'M', '他'];
 
   created() {
-    var holidays: GetHolidayResult = {};
-
+    // テストコード- GAS連携用
     var samplestring = this.$script
       .getSampleString()
       .then(function(value) {
@@ -92,6 +91,7 @@ export default class App extends Vue {
         console.error('console.error', error);
       });
     console.log(samplestring);
+    // テストコード- GAS連携用
 
     const date = new Date();
     var currentYear = date.getFullYear();
@@ -105,6 +105,7 @@ export default class App extends Vue {
 
     this.data.firstDate = new Date(currentYear, currentMonth - 1, currentDate);
     this.data.lastDate = new Date(currentYear, currentMonth, currentDate);
+
     const firstday = this.data.firstDate.getDay();
     const lastday = this.data.lastDate.getDay();
     // Sunday - Saturday : 0 - 6
@@ -134,7 +135,18 @@ export default class App extends Vue {
         this.addData(dt, this.weekStrings[dt.getDay()], false, false);
         i++;
       } while (dt.getDay() < 6);
+      console.log(dt.toLocaleString(), ' : ', this.weekStrings[dt.getDay()]);
     }
+    var strStartDate = currentYear - 1 + '/01/01';
+    var strEndDate = currentYear + 1 + '/12/31';
+    this.$script
+      .getHolidays(strStartDate, strEndDate)
+      .then(function(value) {
+        console.log('getHolidays.then', value);
+      })
+      .catch(function(error) {
+        console.error('getHolidays.error', error);
+      });
   }
   private addData(dt: Date, week: String, isTarget: boolean, isCurrent: boolean) {
     const item: CustomTypes.MyDay = {
@@ -142,18 +154,18 @@ export default class App extends Vue {
       isTarget: isTarget,
       isCurrent: isCurrent,
       isHoliday: false, // TODO
-      holidayName: '国民の祝日', // TODO
+      holidayName: '', // TODO
       week: week,
-      planTime: { inputTime: '7:30', hours: 0, minutes: 0 },
-      totalTime: { inputTime: '7:30', hours: 0, minutes: 0 },
-      remainingTime: { inputTime: '7:30', hours: 0, minutes: 0 },
-      categoryTimes: [
-        { inputTime: '2:30', hours: 0, minutes: 0 },
-        { inputTime: '3:30', hours: 0, minutes: 0 },
-        { inputTime: '0:30', hours: 0, minutes: 0 }
-      ],
-      text: 'サンプル'
+      planTime: { inputTime: '', hours: 0, minutes: 0 },
+      totalTime: { inputTime: '', hours: 0, minutes: 0 },
+      remainingTime: { inputTime: '', hours: 0, minutes: 0 },
+      categoryTimes: [],
+      text: ''
     };
+    this.categoryNames.forEach((weekString: string) => {
+      item.categoryTimes.push({ inputTime: '', hours: 0, minutes: 0 });
+    });
+
     this.tempWeek.days.push(item);
     console.log(
       dt.toLocaleString(),
