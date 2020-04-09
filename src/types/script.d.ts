@@ -24,7 +24,6 @@ declare namespace CustomTypes {
     text: String;
   }
   export interface MyTime {
-    inputTime: String;
     hours: number;
     minutes: number;
   }

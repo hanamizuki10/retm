@@ -11,13 +11,13 @@ describe('CalendarCell.vue', () => {
       isHoliday: false, // TODO
       holidayName: '', // TODO
       week: '土',
-      planTime: { inputTime: '', hours: 0, minutes: 0 },
-      totalTime: { inputTime: '', hours: 0, minutes: 0 },
-      remainingTime: { inputTime: '', hours: 0, minutes: 0 },
+      planTime: { hours: 0, minutes: 0 },
+      totalTime: { hours: 0, minutes: 0 },
+      remainingTime: { hours: 0, minutes: 0 },
       categoryTimes: [
-        { inputTime: '', hours: 0, minutes: 0 },
-        { inputTime: '', hours: 0, minutes: 0 },
-        { inputTime: '', hours: 0, minutes: 0 }
+        { hours: 0, minutes: 0 },
+        { hours: 0, minutes: 0 },
+        { hours: 0, minutes: 0 }
       ],
       text: ''
     };

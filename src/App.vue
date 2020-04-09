@@ -36,7 +36,9 @@
             </v-menu>
           </v-col>
           <v-spacer></v-spacer>
-          <v-col cols="12" sm="6" md="4"></v-col>
+          <v-col cols="12" sm="6" md="4">
+            <InputTime :data="totalTime" />
+          </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" sm="6" md="4">
             <v-checkbox v-model="isHolidayDisp" label="日本の祝日を適用"></v-checkbox>
@@ -63,15 +65,18 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import CalendarCell from './components/CalendarCell.vue';
+import InputTime from './components/InputTime.vue';
 
 @Component({
   components: {
-    CalendarCell
+    CalendarCell,
+    InputTime
   }
 })
 export default class App extends Vue {
   private weekStrings = ['日', '月', '火', '水', '木', '金', '土'];
   private data: CustomTypes.MyMonth = { firstDate: null, lastDate: null, weeks: [] };
+  private totalTime: CustomTypes.MyTime = { hours: 7, minutes: 30 };
   private tempWeek: CustomTypes.MyWeek = { days: [] };
   private today = '';
   private selectedDay = '';
@@ -156,14 +161,14 @@ export default class App extends Vue {
       isHoliday: false, // TODO
       holidayName: '', // TODO
       week: week,
-      planTime: { inputTime: '', hours: 0, minutes: 0 },
-      totalTime: { inputTime: '', hours: 0, minutes: 0 },
-      remainingTime: { inputTime: '', hours: 0, minutes: 0 },
+      planTime: { hours: 0, minutes: 0 },
+      totalTime: { hours: 0, minutes: 0 },
+      remainingTime: { hours: 0, minutes: 0 },
       categoryTimes: [],
       text: ''
     };
     this.categoryNames.forEach((weekString: string) => {
-      item.categoryTimes.push({ inputTime: '', hours: 0, minutes: 0 });
+      item.categoryTimes.push({ hours: 0, minutes: 0 });
     });
 
     this.tempWeek.days.push(item);
@@ -203,7 +208,7 @@ export default class App extends Vue {
       });
       str += '\r\n';
       week.days.forEach((day: CustomTypes.MyDay) => {
-        str += day.planTime.inputTime;
+        str += day.planTime.hours + ':' + day.planTime.minutes;
         str += '\t';
         str += '\t';
         str += '\t';
@@ -215,7 +220,7 @@ export default class App extends Vue {
           str += '\t';
           str += categoryName;
           str += '\t';
-          str += day.categoryTimes[index].inputTime;
+          str += day.categoryTimes[index].hours + ':' + day.categoryTimes[index].minutes;
           str += '\t';
           str += '\t';
         });
@@ -226,7 +231,7 @@ export default class App extends Vue {
         str += '\t';
         str += '総時間';
         str += '\t';
-        str += day.totalTime.inputTime;
+        str += day.totalTime.hours + ':' + day.totalTime.minutes;
         str += '\t';
       });
       str += '\r\n';
@@ -235,7 +240,7 @@ export default class App extends Vue {
         str += '\t';
         str += '残時間';
         str += '\t';
-        str += day.remainingTime.inputTime;
+        str += day.remainingTime.hours + ':' + day.remainingTime.minutes;
         str += '\t';
       });
       str += '\r\n';
