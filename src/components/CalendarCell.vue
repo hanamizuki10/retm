@@ -6,30 +6,24 @@
       <td colspan="2">{{ data.holidayName }}</td>
     </tr>
     <tr>
-      <td colspan="4" class="text-align-center planTime">
-        <v-text-field name="planTime" v-model="data.planTime.inputTime" outlined></v-text-field>
+      <td colspan="4" class="text-align-center planTime" style="background-color:#b0f3ff;">
+        <InputTime v-model="data.planTime" size="medium" color="#b0f3ff" />
       </td>
     </tr>
     <tr v-for="(categoryName, index) in categoryNames" :key="categoryName">
-      <td></td>
+      <td>{{ categoryName }}</td>
       <td colspan="2" class="text-align-center categoryTimes">
-        <v-text-field
-          name="categoryTimes"
-          :label="categoryName"
-          v-model="data.categoryTimes[index].inputTime"
-          outlined
-          dense
-        ></v-text-field>
+        <InputTime v-model="data.categoryTimes[index]" size="small" color="#ffffff" />
       </td>
       <td></td>
     </tr>
     <tr>
       <td colspan="3" class="text-align-right">総時間</td>
-      <td>{{ data.totalTime.inputTime }}</td>
+      <td>{{ data.totalTime.hours + ':' + data.totalTime.minutes }}</td>
     </tr>
     <tr>
       <td colspan="3" class="text-align-right">残時間</td>
-      <td>{{ data.remainingTime.inputTime }}</td>
+      <td>{{ data.remainingTime.hours + ':' + data.remainingTime.minutes }}</td>
     </tr>
     <tr>
       <td colspan="4" class="text-align-center text">
@@ -41,8 +35,13 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import InputTime from './InputTime.vue';
 
-@Component
+@Component({
+  components: {
+    InputTime
+  }
+})
 export default class CalendarCell extends Vue {
   //@Prop() private data!: CustomTypes.MyDay;
   @Prop() private data!: any;
