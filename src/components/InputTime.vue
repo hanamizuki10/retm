@@ -32,6 +32,10 @@ export default class InputTime extends Vue {
   //@Prop({ default: '#b0f3ff' }) private color!: string;
   @Prop({ default: '#ffffff' }) private color!: string;
 
+  get refs(): any {
+    return this.$refs;
+  }
+
   private get localValue(): CustomTypes.MyTime {
     return this.value;
   }
@@ -60,14 +64,13 @@ export default class InputTime extends Vue {
 
   private forcusHours() {
     // 時間の入力にフォーカスを移動する
-    const h: HTMLInputElement = this.$refs.r1;
-    h.focus();
-    this.$refs.r1.select();
+    this.refs.r1.focus();
+    this.refs.r1.select();
   }
   private forcusMinutes() {
     // 分の入力にフォーカスを移動する
-    this.$refs.r2.focus();
-    this.$refs.r2.select();
+    this.refs.r2.focus();
+    this.refs.r2.select();
   }
 }
 </script>

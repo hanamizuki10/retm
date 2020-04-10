@@ -15,7 +15,7 @@
         <v-row>
           <v-col cols="12" sm="6" md="4">
             <v-menu
-              v-model="menu1"
+              v-model="menu"
               :close-on-content-click="false"
               :nudge-right="40"
               transition="scale-transition"
@@ -26,22 +26,22 @@
                 <v-text-field
                   v-model="datePickerDate"
                   label="起点日"
-                  prepend-icon="fas fa-calendar-alt"
                   readonly
                   v-on="on"
+                  @change="loadCalendar"
                 ></v-text-field>
               </template>
-              <v-date-picker v-model="datePickerDate" @input="menu1 = false" locale="ja-JP">
+              <v-date-picker v-model="datePickerDate" @input="menu = false" locale="ja-JP">
               </v-date-picker>
             </v-menu>
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" sm="6" md="4">
-            <InputTime :data="totalTime" />
+            <InputTime v-model="totalTime" />
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="12" sm="6" md="4">
-            <v-checkbox v-model="isHolidayDisp" label="日本の祝日を適用"></v-checkbox>
+            <v-btn large color="info" @click="showHolidays">日本の祝日を適用</v-btn>
           </v-col>
         </v-row>
       </div>
@@ -80,9 +80,8 @@ export default class App extends Vue {
   private tempWeek: CustomTypes.MyWeek = { days: [] };
   private today = '';
   private selectedDay = '';
-  private isHolidayDisp = false;
   private datePickerDate = new Date().toISOString().substr(0, 10);
-  private menu1 = false;
+  private menu = false;
   private categoryNames = ['A', 'M', '他'];
 
   created() {
@@ -98,7 +97,11 @@ export default class App extends Vue {
     console.log(samplestring);
     // テストコード- GAS連携用
 
-    const date = new Date();
+    // 初期値では今日を起点とした日付で情報を表示する
+    this.loadCalendar();
+  }
+  private loadCalendar() {
+    const date = new Date(this.datePickerDate);
     var currentYear = date.getFullYear();
     var currentMonth = date.getMonth() + 1;
     var currentDate = date.getDate();
@@ -153,6 +156,24 @@ export default class App extends Vue {
         console.error('getHolidays.error', error);
       });
   }
+
+  private showHolidays() {
+    // 日本の祝日を適用ボタンを押されたら、データを取得してカレンダーに反映させる。
+    var currentYear = new Date(this.datePickerDate).getFullYear();
+    var strStartDate = currentYear - 1 + '/01/01';
+    var strEndDate = currentYear + 1 + '/12/31';
+    this.$script
+      .getHolidays(strStartDate, strEndDate)
+      .then(function(value) {
+        console.log('getHolidays.then', value);
+        // TODO:カレンダーに反映させる
+      })
+      .catch(function(error) {
+        console.error('getHolidays.error', error);
+        // TODO:エラー処理の実装
+      });
+  }
+
   private addData(dt: Date, week: String, isTarget: boolean, isCurrent: boolean) {
     const item: CustomTypes.MyDay = {
       date: dt,
