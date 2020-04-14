@@ -93,7 +93,12 @@ import InputTime from './components/InputTime.vue';
 export default class App extends Vue {
   private weekStrings = ['日', '月', '火', '水', '木', '金', '土'];
   private data: CustomTypes.MyMonth = { firstDate: null, lastDate: null, weeks: [] };
-  private totalTime: CustomTypes.MyTime = { hours: 7, minutes: 30 };
+  private totalTime: CustomTypes.MyTime = {
+    strHours: '07',
+    strMinutes: '30',
+    hours: 7,
+    minutes: 30
+  };
   private tempWeek: CustomTypes.MyWeek = { days: [] };
   //private daylist: CustomTypes.MyDays = {};
   private today = '';
@@ -204,14 +209,14 @@ export default class App extends Vue {
       isHoliday: false, // TODO
       holidayName: '', // TODO
       week: week,
-      planTime: { hours: 0, minutes: 0 },
-      totalTime: { hours: 0, minutes: 0 },
-      remainingTime: { hours: 0, minutes: 0 },
+      planTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      totalTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      remainingTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
       categoryTimes: [],
       text: ''
     };
     this.categoryNames.forEach((weekString: string) => {
-      item.categoryTimes.push({ hours: 0, minutes: 0 });
+      item.categoryTimes.push({ strHours: '00', strMinutes: '00', hours: 0, minutes: 0 });
     });
     calendardata.addMyDay(item);
 
