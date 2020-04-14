@@ -11,7 +11,24 @@
     </v-app-bar>
 
     <v-content>
-      <div class="ml-4">
+      <div>
+        <v-row>
+          <v-col>←</v-col>
+          <v-col>2020年</v-col>
+          <v-col>1月</v-col>
+          <v-col>2月</v-col>
+          <v-col>3月</v-col>
+          <v-col>4月</v-col>
+          <v-col>5月</v-col>
+          <v-col>6月</v-col>
+          <v-col>7月</v-col>
+          <v-col>8月</v-col>
+          <v-col>9月</v-col>
+          <v-col>10月</v-col>
+          <v-col>11月</v-col>
+          <v-col>12月</v-col>
+          <v-col>→</v-col>
+        </v-row>
         <v-row>
           <v-col cols="12" sm="6" md="4">
             <v-menu
@@ -28,7 +45,6 @@
                   label="起点日"
                   readonly
                   v-on="on"
-                  @change="loadCalendar"
                 ></v-text-field>
               </template>
               <v-date-picker v-model="datePickerDate" @input="menu = false" locale="ja-JP">
@@ -46,24 +62,25 @@
         </v-row>
       </div>
       <hr />
-      <table class="calendar">
-        <tr>
-          <td v-for="w in weekStrings" :key="w">
+      <v-container class="calendar">
+        <v-row>
+          <v-col v-for="w in weekStrings" :key="w">
             {{ w }}
-          </td>
-        </tr>
-        <tr v-for="week in data.weeks" :key="week">
-          <td v-for="day in week.days" :key="day">
-            <CalendarCell :data="day" :categoryNames="categoryNames" />
-          </td>
-        </tr>
-      </table>
+          </v-col>
+        </v-row>
+        <v-row v-for="week in data.weeks" :key="week">
+          <v-col v-for="day in week.days" :key="day" :class="cellColor(day)">
+            <CalendarCell :keyDayString="day" :categoryNames="categoryNames" />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-content>
   </v-app>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
+import calendardata from './store/modules/data';
 import CalendarCell from './components/CalendarCell.vue';
 import InputTime from './components/InputTime.vue';
 
@@ -78,57 +95,56 @@ export default class App extends Vue {
   private data: CustomTypes.MyMonth = { firstDate: null, lastDate: null, weeks: [] };
   private totalTime: CustomTypes.MyTime = { hours: 7, minutes: 30 };
   private tempWeek: CustomTypes.MyWeek = { days: [] };
+  //private daylist: CustomTypes.MyDays = {};
   private today = '';
   private selectedDay = '';
   private datePickerDate = new Date().toISOString().substr(0, 10);
   private menu = false;
-  private categoryNames = ['A', 'M', '他'];
+  //private categoryNames = ['A', 'M', '他'];
+
+  get daylist(): CustomTypes.MyDays {
+    return calendardata.days;
+  }
+  get categoryNames(): string[] {
+    return calendardata.categoryNames;
+  }
 
   created() {
-    // テストコード- GAS連携用
-    var samplestring = this.$script
-      .getSampleString()
-      .then(function(value) {
-        console.log('console.log', value);
-      })
-      .catch(function(error) {
-        console.error('console.error', error);
-      });
-    console.log(samplestring);
-    // テストコード- GAS連携用
-
     // 初期値では今日を起点とした日付で情報を表示する
     this.loadCalendar();
   }
   private loadCalendar() {
     const date = new Date(this.datePickerDate);
-    var currentYear = date.getFullYear();
-    var currentMonth = date.getMonth() + 1;
-    var currentDate = date.getDate();
+    var targetYear = date.getFullYear();
+    var targetMonth = date.getMonth() + 1;
+    var targetDate = date.getDate();
+    console.log('loadCalendar', targetYear, targetMonth, targetDate);
+    // リセット
+    this.data = { firstDate: null, lastDate: null, weeks: [] };
 
-    const strMonth = ('0' + currentMonth).slice(-2);
-    this.today = this.selectedDay = `${currentYear}-${strMonth}-${currentDate}`;
-    console.log([currentYear, currentMonth, currentDate]);
+    const strMonth = ('0' + targetMonth).slice(-2);
+    this.today = this.selectedDay = `${targetYear}-${strMonth}-${targetDate}`;
+    console.log([targetYear, targetMonth, targetDate]);
     console.log([this.today, this.selectedDay]);
 
-    this.data.firstDate = new Date(currentYear, currentMonth - 1, currentDate);
-    this.data.lastDate = new Date(currentYear, currentMonth, currentDate);
+    this.data.firstDate = new Date(targetYear, targetMonth - 1, targetDate);
+    this.data.lastDate = new Date(targetYear, targetMonth, targetDate - 1);
 
     const firstday = this.data.firstDate.getDay();
     const lastday = this.data.lastDate.getDay();
     // Sunday - Saturday : 0 - 6
     if (firstday != 0) {
       for (var i = 0; i < firstday; i++) {
-        const dt = new Date(currentYear, currentMonth - 1, currentDate);
+        const dt = new Date(targetYear, targetMonth - 1, targetDate);
         dt.setDate(dt.getDate() - (firstday - i));
         this.addData(dt, this.weekStrings[dt.getDay()], false, false);
       }
     }
     console.log('pre----');
     for (var i = 0; i < 32; i++) {
-      const dt = new Date(currentYear, currentMonth - 1, currentDate);
+      const dt = new Date(targetYear, targetMonth - 1, targetDate);
       dt.setDate(dt.getDate() + i);
-      this.addData(dt, this.weekStrings[dt.getDay()], false, i == 0);
+      this.addData(dt, this.weekStrings[dt.getDay()], true, i == 0);
       if (dt.toLocaleString() == this.data.lastDate.toLocaleString()) {
         console.log('break!');
         break;
@@ -137,7 +153,7 @@ export default class App extends Vue {
     console.log('post----');
     if (lastday < 6) {
       var i = 1;
-      const dt = new Date(currentYear, currentMonth, currentDate);
+      const dt = new Date(targetYear, targetMonth, targetDate);
       do {
         dt.setDate(this.data.lastDate.getDate() + i);
         this.addData(dt, this.weekStrings[dt.getDay()], false, false);
@@ -145,16 +161,12 @@ export default class App extends Vue {
       } while (dt.getDay() < 6);
       console.log(dt.toLocaleString(), ' : ', this.weekStrings[dt.getDay()]);
     }
-    var strStartDate = currentYear - 1 + '/01/01';
-    var strEndDate = currentYear + 1 + '/12/31';
-    this.$script
-      .getHolidays(strStartDate, strEndDate)
-      .then(function(value) {
-        console.log('getHolidays.then', value);
-      })
-      .catch(function(error) {
-        console.error('getHolidays.error', error);
-      });
+  }
+
+  @Watch('datePickerDate')
+  private changeStartDay() {
+    this.loadCalendar();
+    console.log(this.datePickerDate);
   }
 
   private showHolidays() {
@@ -162,11 +174,20 @@ export default class App extends Vue {
     var currentYear = new Date(this.datePickerDate).getFullYear();
     var strStartDate = currentYear - 1 + '/01/01';
     var strEndDate = currentYear + 1 + '/12/31';
+    var _this = this;
     this.$script
       .getHolidays(strStartDate, strEndDate)
-      .then(function(value) {
-        console.log('getHolidays.then', value);
+      .then(function(holidays) {
+        console.log('getHolidays.then', holidays);
         // TODO:カレンダーに反映させる
+        for (const [key, value] of Object.entries(holidays)) {
+          console.log(key, value);
+          const info: CustomTypes.HolidayInfo = {
+            keyDayString: key,
+            holidayName: value
+          };
+          calendardata.addHoliday(info);
+        }
       })
       .catch(function(error) {
         console.error('getHolidays.error', error);
@@ -174,9 +195,10 @@ export default class App extends Vue {
       });
   }
 
-  private addData(dt: Date, week: String, isTarget: boolean, isCurrent: boolean) {
+  private addData(dt: Date, week: string, isTarget: boolean, isCurrent: boolean) {
     const item: CustomTypes.MyDay = {
       date: dt,
+      keyDayString: this.formatDate(dt),
       isTarget: isTarget,
       isCurrent: isCurrent,
       isHoliday: false, // TODO
@@ -191,8 +213,9 @@ export default class App extends Vue {
     this.categoryNames.forEach((weekString: string) => {
       item.categoryTimes.push({ hours: 0, minutes: 0 });
     });
+    calendardata.addMyDay(item);
 
-    this.tempWeek.days.push(item);
+    this.tempWeek.days.push(item.keyDayString);
     console.log(
       dt.toLocaleString(),
       ' : ',
@@ -206,9 +229,28 @@ export default class App extends Vue {
       this.tempWeek = { days: [] };
     }
   }
+  private formatDate(date: Date) {
+    var targetYear = date.getFullYear();
+    var targetMonth = date.getMonth() + 1;
+    var targetDate = date.getDate();
+    return targetYear + '-' + ('00' + targetMonth).slice(-2) + '-' + ('00' + targetDate).slice(-2);
+  }
 
+  private cellColor(keyDayString: string): string {
+    if (!this.daylist[keyDayString].isTarget) {
+      return 'not-target';
+    }
+    if ('土' == this.daylist[keyDayString].week) {
+      return 'saturday';
+    } else if ('日' == this.daylist[keyDayString].week) {
+      return 'sunday';
+    } else {
+      return '';
+    }
+  }
   public copy() {
     var str = '';
+    var _this = this;
     this.weekStrings.forEach((weekString: string) => {
       str += weekString;
       str += '\t';
@@ -218,18 +260,18 @@ export default class App extends Vue {
     });
     str += '\r\n';
     this.data.weeks.forEach((week: CustomTypes.MyWeek) => {
-      week.days.forEach((day: CustomTypes.MyDay) => {
-        str += day.date.getDate();
+      week.days.forEach((day: string) => {
+        str += _this.daylist[day].date.getDate();
         str += '\t';
         str += '\t';
-        str += day.text;
+        str += _this.daylist[day].text;
         str += '\t';
-        str += day.holidayName;
+        str += _this.daylist[day].holidayName;
         str += '\t';
       });
       str += '\r\n';
-      week.days.forEach((day: CustomTypes.MyDay) => {
-        str += day.planTime.hours + ':' + day.planTime.minutes;
+      week.days.forEach((day: string) => {
+        str += _this.daylist[day].planTime.hours + ':' + _this.daylist[day].planTime.minutes;
         str += '\t';
         str += '\t';
         str += '\t';
@@ -237,31 +279,33 @@ export default class App extends Vue {
       });
       str += '\r\n';
       this.categoryNames.forEach((categoryName: string, index: number) => {
-        week.days.forEach((day: CustomTypes.MyDay) => {
+        week.days.forEach((day: string) => {
           str += '\t';
           str += categoryName;
           str += '\t';
-          str += day.categoryTimes[index].hours + ':' + day.categoryTimes[index].minutes;
+          str += _this.daylist[day].categoryTimes[index].hours;
+          str += ':' + _this.daylist[day].categoryTimes[index].minutes;
           str += '\t';
           str += '\t';
         });
         str += '\r\n';
       });
-      week.days.forEach((day: CustomTypes.MyDay) => {
+      week.days.forEach((day: string) => {
         str += '\t';
         str += '\t';
         str += '総時間';
         str += '\t';
-        str += day.totalTime.hours + ':' + day.totalTime.minutes;
+        str += _this.daylist[day].totalTime.hours + ':' + _this.daylist[day].totalTime.minutes;
         str += '\t';
       });
       str += '\r\n';
-      week.days.forEach((day: CustomTypes.MyDay) => {
+      week.days.forEach((day: string) => {
         str += '\t';
         str += '\t';
         str += '残時間';
         str += '\t';
-        str += day.remainingTime.hours + ':' + day.remainingTime.minutes;
+        str += _this.daylist[day].remainingTime.hours;
+        str += ':' + _this.daylist[day].remainingTime.minutes;
         str += '\t';
       });
       str += '\r\n';
@@ -292,11 +336,20 @@ export default class App extends Vue {
   color: #2c3e50;
   margin-top: 60px;
 }
-table.calendar {
-  border-collapse: collapse;
-}
-table.calendar td {
+div.calendar div.row {
   border: solid 1px black;
-  /*実線 1px 黒*/
+}
+div.calendar div.col {
+  border: solid 1px black;
+  padding: 0px;
+}
+.not-target {
+  background-color: darkgray;
+}
+.saturday {
+  background-color: aqua;
+}
+.sunday {
+  background-color: burlywood;
 }
 </style>
