@@ -1,33 +1,39 @@
 <template>
   <v-container class="calendar-cell">
     <v-row>
-      <v-col lg="2">{{ item.date.getDate() }}</v-col>
+      <v-col lg="2">{{ item.day }},{{ item.isCurrent }}</v-col>
+      <v-spacer></v-spacer>
       <v-col md="auto">{{ item.holidayName }}</v-col>
     </v-row>
     <div v-if="item.isTarget">
       <v-row>
         <v-col></v-col>
         <v-col md="auto" class="planTime">
-          <InputTime v-model="item.planTime" size="medium" color="#b0f3ff" />
+          <InputTime v-model="item.planTime" size="medium" color="#b0f3ff" @input="input" />
         </v-col>
         <v-col></v-col>
       </v-row>
       <v-row v-for="(categoryName, index) in categoryNames" :key="categoryName">
-        <v-col>{{ categoryName }}</v-col>
+        <v-col class="caption">{{ categoryName }}</v-col>
         <v-col class="text-align-center categoryTimes">
-          <InputTime v-model="item.categoryTimes[index]" size="small" color="#ffffff" />
+          <InputTime
+            v-model="item.categoryTimes[index]"
+            size="small"
+            color="#ffffff"
+            @input="input"
+          />
         </v-col>
         <v-col></v-col>
       </v-row>
       <v-row>
-        <v-col></v-col>
-        <v-col class="text-align-right">総時間</v-col>
-        <v-col>{{ item.totalTime.hours + ':' + item.totalTime.minutes }}</v-col>
+        <v-col class="text-align-right caption">
+          総時間 {{ item.totalTime.strHours + ':' + item.totalTime.strMinutes }}
+        </v-col>
       </v-row>
       <v-row>
-        <v-col></v-col>
-        <v-col class="text-align-right">残時間</v-col>
-        <v-col>{{ item.remainingTime.hours + ':' + item.remainingTime.minutes }}</v-col>
+        <v-col class="text-align-right caption">
+          残時間 {{ item.remainingTime.strHours + ':' + item.remainingTime.strMinutes }}
+        </v-col>
       </v-row>
     </div>
   </v-container>
@@ -48,18 +54,28 @@ export default class CalendarCell extends Vue {
   @Prop() private categoryNames!: String[];
 
   get item(): CustomTypes.MyDay {
-    return calendardata.days[this.keyDayString];
+    return calendardata.moduleDays[this.keyDayString];
+  }
+  private input(event: Event) {
+    // 累積時間、残時間の再計算を行う
+    calendardata.calc();
+    console.log('this.item.planTime', this.item.planTime);
   }
 }
 </script>
 
 <style scoped>
-div.calendar-cell div.row {
+.calendar-cell {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.calendar-cell div.row {
   border: none;
 }
-div.calendar-cell div.col {
+.calendar-cell div.col {
   border: none;
-  padding: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
 }
 .text-align-center {
   text-align: center;
@@ -71,13 +87,10 @@ table.calendar v-col {
   border: none;
 }
 .planTime div {
-  width: 100px;
-}
-.planTime input {
-  text-align: center;
+  min-width: 80px;
 }
 .categoryTimes div {
-  width: 100px;
+  min-width: 70px;
 }
 .text div {
   width: 100px;
