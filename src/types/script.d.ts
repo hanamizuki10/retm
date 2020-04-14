@@ -21,6 +21,7 @@ declare namespace CustomTypes {
   }
   export interface MyDay {
     date: Date;
+    day: number;
     keyDayString: string;
     isTarget: boolean;
     isCurrent: boolean;

@@ -6,18 +6,20 @@ describe('CalendarCell.vue', () => {
 
     const data: CustomTypes.MyDay = {
       date: new Date(2020, 0, 1),
+      day: 1,
+      keyDayString: '2020-01-01',
       isTarget: false,
       isCurrent: false,
       isHoliday: false, // TODO
       holidayName: '', // TODO
       week: '土',
-      planTime: { hours: 0, minutes: 0 },
-      totalTime: { hours: 0, minutes: 0 },
-      remainingTime: { hours: 0, minutes: 0 },
+      planTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      totalTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      remainingTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
       categoryTimes: [
-        { hours: 0, minutes: 0 },
-        { hours: 0, minutes: 0 },
-        { hours: 0, minutes: 0 }
+        { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+        { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+        { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 }
       ],
       text: ''
     };
