@@ -52,11 +52,6 @@ module.exports = {
             path: 'dist/vue.runtime.min.js'
           },
           {
-            name: 'vue-router',
-            var: 'VueRouter',
-            path: 'dist/vue-router.min.js'
-          },
-          {
             name: 'vuetify',
             var: 'Vuetify',
             path: 'dist/vuetify.min.js',
