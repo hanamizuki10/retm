@@ -34,6 +34,8 @@ declare namespace CustomTypes {
     text: string;
   }
   export interface MyTime {
+    strHours: string;
+    strMinutes: string;
     hours: number;
     minutes: number;
   }

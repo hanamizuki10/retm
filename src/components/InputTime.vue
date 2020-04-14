@@ -2,7 +2,7 @@
   <div class="input-time" :class="size" :style="'background-color: ' + color">
     <input
       ref="r1"
-      v-model="localValue.hours"
+      v-model="localValue.strHours"
       maxlength="2"
       @input="inputHours"
       @keyup.right="forcusMinutes"
@@ -11,7 +11,7 @@
     :
     <input
       ref="r2"
-      v-model="localValue.minutes"
+      v-model="localValue.strMinutes"
       maxlength="2"
       @input="inputMinutes"
       @keyup.left="forcusHours"
@@ -48,7 +48,8 @@ export default class InputTime extends Vue {
   public input(value: CustomTypes.MyTime) {}
 
   private inputHours(event: Event) {
-    const charLength = String(this.value.hours).length;
+    const charLength = String(this.value.strHours).length;
+    this.value.hours = parseInt(this.value.strHours, 10); // TODO:数値以外の入力対策
     if (charLength === 2) {
       // ２文字入力された事を感知したら分へ移動
       this.forcusMinutes();
@@ -56,7 +57,8 @@ export default class InputTime extends Vue {
   }
 
   private inputMinutes(event: Event) {
-    const charLength = String(this.value.minutes).length;
+    const charLength = String(this.value.strMinutes).length;
+    this.value.minutes = parseInt(this.value.strMinutes, 10); // TODO:数値以外の入力対策
     if (charLength === 0) {
       this.forcusHours();
     }
