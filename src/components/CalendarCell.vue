@@ -3,19 +3,17 @@
     <v-row>
       <v-col lg="2">{{ item.day }},{{ item.isCurrent }}</v-col>
       <v-spacer></v-spacer>
-      <v-col md="auto">{{ item.holidayName }}</v-col>
+      <v-col md="auto" class="font-red caption">{{ item.holidayName }}</v-col>
     </v-row>
-    <div v-if="item.isTarget">
-      <v-row>
-        <v-col></v-col>
+    <div v-if="isInput">
+      <v-row style="background-color: #b0f3ff;">
         <v-col md="auto" class="planTime">
           <InputTime v-model="item.planTime" size="medium" color="#b0f3ff" @input="input" />
         </v-col>
-        <v-col></v-col>
       </v-row>
       <v-row v-for="(categoryName, index) in categoryNames" :key="categoryName">
-        <v-col class="caption">{{ categoryName }}</v-col>
         <v-col class="text-align-center categoryTimes">
+          <label class="caption"> {{ categoryName }} </label>
           <InputTime
             v-model="item.categoryTimes[index]"
             size="small"
@@ -23,8 +21,9 @@
             @input="input"
           />
         </v-col>
-        <v-col></v-col>
       </v-row>
+    </div>
+    <div v-if="item.isTarget">
       <v-row>
         <v-col class="text-align-right caption">
           総時間 {{ item.totalTime.strHours + ':' + item.totalTime.strMinutes }}
@@ -52,6 +51,22 @@ import InputTime from './InputTime.vue';
 export default class CalendarCell extends Vue {
   @Prop() private keyDayString!: string;
   @Prop() private categoryNames!: String[];
+
+  get isInput(): boolean {
+    if (!this.item.isTarget) {
+      return false;
+    }
+    if (!calendardata.moduleIsInputHoliday) {
+      if ('土' == this.item.week) {
+        return false;
+      } else if ('日' == this.item.week) {
+        return false;
+      } else if (this.item.isHoliday) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   get item(): CustomTypes.MyDay {
     return calendardata.moduleDays[this.keyDayString];
@@ -94,5 +109,8 @@ table.calendar v-col {
 }
 .text div {
   width: 100px;
+}
+.font-red {
+  color: red;
 }
 </style>

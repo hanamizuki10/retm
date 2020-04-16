@@ -13,6 +13,11 @@ class DataModule extends VuexModule {
   private _inputTimes: CustomTypes.InputTimes = DataModule.generateEmptyInputTimes();
   private _accumulationTimes: CustomTypes.AccumulationTimes = DataModule.generateEmptyAccumulationTimes();
   private _days: CustomTypes.MyDays = {};
+  private _isInputHoliday: boolean = false; // 土日祝日も入力モードとするか
+
+  public get moduleIsInputHoliday(): boolean {
+    return this._isInputHoliday; // 土日祝日も入力モードとするか
+  }
 
   public get moduleInputTimes(): CustomTypes.InputTimes {
     return this._inputTimes;
@@ -50,6 +55,15 @@ class DataModule extends VuexModule {
   @Mutation
   public setAccumulationTimes(accumulationTimes: CustomTypes.AccumulationTimes) {
     this._accumulationTimes = accumulationTimes;
+  }
+  @Mutation
+  public setIsInputHoliday(isInputHoliday: boolean) {
+    this._isInputHoliday = isInputHoliday;
+  }
+
+  @Action
+  public updateIsInputHoliday(isInputHoliday: boolean) {
+    this.setIsInputHoliday(isInputHoliday);
   }
 
   @Action
