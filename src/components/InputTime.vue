@@ -1,5 +1,5 @@
 <template>
-  <div class="input-time" :class="size" :style="'background-color: ' + color">
+  <div class="input-time" :class="size">
     <input
       ref="r1"
       class="hours"
@@ -31,8 +31,6 @@ export default class InputTime extends Vue {
   //@Prop({ default: 'small' }) private size!: string;
   @Prop({ default: 'medium' }) private size!: string;
   //@Prop({ default: 'large' }) private size!: string;
-  //@Prop({ default: '#b0f3ff' }) private color!: string;
-  @Prop({ default: '#ffffff' }) private color!: string;
   @Prop({ default: 2 }) private limitLength!: number;
 
   get refs(): any {
@@ -79,8 +77,9 @@ export default class InputTime extends Vue {
 .input-time {
   margin: 0px;
   padding: 0px;
-  border-bottom: 0.5px solid #bbbbbb;
+  /* border-bottom: 0.5px solid #bbbbbb;*/ /* 下線 */
   display: inline;
+  color: blue;
 }
 input {
   margin: 0px;

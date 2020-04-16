@@ -83,6 +83,17 @@
             <v-btn large color="info" @click="showHolidays">日本の祝日を適用</v-btn>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col>
+            <input
+              type="checkbox"
+              id="isInputHoliday"
+              :checked="isInputHoliday"
+              @change="changeIsInputHoliday"
+            />
+            <label for="isInputHoliday">土日祝日も入力モードとするか</label>
+          </v-col>
+        </v-row>
       </v-container>
       <Calendar />
     </v-content>
@@ -104,6 +115,10 @@ import InputTime from './components/InputTime.vue';
 export default class App extends Vue {
   private datePickerDate = new Date().toISOString().substr(0, 10);
   private menu = false;
+
+  get isInputHoliday(): boolean {
+    return calendardata.moduleIsInputHoliday;
+  }
 
   get weekStrings(): string[] {
     return calendardata.moduleWeekStrings;
@@ -156,6 +171,9 @@ export default class App extends Vue {
   @Watch('data')
   private changeCalendardata() {
     console.log('changeCalendardata');
+  }
+  private changeIsInputHoliday(event: Event) {
+    calendardata.setIsInputHoliday(!this.isInputHoliday);
   }
 
   private showHolidays() {
