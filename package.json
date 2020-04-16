@@ -14,7 +14,6 @@
     "open": "clasp open"
   },
   "dependencies": {
-    "@mdi/font": "^3.6.95",
     "core-js": "^3.6.4",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
