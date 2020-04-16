@@ -71,12 +71,12 @@
           <v-col>
             <!-- TODO: 累積時間 -->
             <label class="v-label v-label--active theme--light caption">累積時間</label>
-            <InputTime v-model="accumulationTotalTime" color="#cccccc" />
+            <InputTime v-model="accumulationTotalTime" color="#cccccc" :limitLength="3" />
           </v-col>
           <v-col>
             <!-- TODO: 残時間 -->
             <label class="v-label v-label--active theme--light caption">残時間</label>
-            <InputTime v-model="accumulationRemainingTime" color="#cccccc" />
+            <InputTime v-model="accumulationRemainingTime" color="#cccccc" :limitLength="3" />
           </v-col>
           <v-spacer></v-spacer>
           <v-col>
@@ -134,11 +134,11 @@ export default class App extends Vue {
   }
 
   get accumulationTotalTime(): CustomTypes.MyTime {
-    return { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 };
+    return calendardata.moduleAccumulationTimes.totalTime;
   }
 
   get accumulationRemainingTime(): CustomTypes.MyTime {
-    return { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 };
+    return calendardata.moduleAccumulationTimes.remainingTime;
   }
 
   created() {
