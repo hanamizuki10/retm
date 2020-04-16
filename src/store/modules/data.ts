@@ -9,8 +9,18 @@ import store from '@/store/';
 class DataModule extends VuexModule {
   private _weekStrings = ['日', '月', '火', '水', '木', '金', '土'];
   private _categoryNames: string[] = ['A', 'M', '他'];
-  private _data: CustomTypes.MyMonth = { firstDate: null, lastDate: null, weeks: [] };
+  private _data: CustomTypes.MyMonth = DataModule.generateEmptyMyMonth();
+  private _inputTimes: CustomTypes.InputTimes = DataModule.generateEmptyInputTimes();
+  private _accumulationTimes: CustomTypes.AccumulationTimes = DataModule.generateEmptyAccumulationTimes();
   private _days: CustomTypes.MyDays = {};
+
+  public get moduleInputTimes(): CustomTypes.InputTimes {
+    return this._inputTimes;
+  }
+
+  public get moduleAccumulationTimes(): CustomTypes.AccumulationTimes {
+    return this._accumulationTimes;
+  }
 
   public get moduleWeekStrings(): string[] {
     return this._weekStrings;
@@ -36,6 +46,10 @@ class DataModule extends VuexModule {
   @Mutation
   public setMyMonth(data: CustomTypes.MyMonth) {
     this._data = data;
+  }
+  @Mutation
+  public setAccumulationTimes(accumulationTimes: CustomTypes.AccumulationTimes) {
+    this._accumulationTimes = accumulationTimes;
   }
 
   @Action
@@ -77,7 +91,7 @@ class DataModule extends VuexModule {
   @Action
   public resetData() {
     this.setMyDays({});
-    this.setMyMonth({ firstDate: null, lastDate: null, weeks: [] });
+    this.setMyMonth(DataModule.generateEmptyMyMonth());
   }
 
   @Action
@@ -88,7 +102,7 @@ class DataModule extends VuexModule {
     var targetYear = date.getFullYear();
     var targetMonth = date.getMonth() + 1;
     var targetDate = date.getDate();
-    var data: CustomTypes.MyMonth = { firstDate: null, lastDate: null, weeks: [] };
+    var data: CustomTypes.MyMonth = DataModule.generateEmptyMyMonth();
     data.firstDate = new Date(targetYear, targetMonth - 1, targetDate);
     data.lastDate = new Date(targetYear, targetMonth, targetDate - 1);
 
@@ -156,14 +170,44 @@ class DataModule extends VuexModule {
       isHoliday: false,
       holidayName: '',
       week: week,
-      planTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
-      totalTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
-      remainingTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      planTime: DataModule.generateMyTime(0, 0),
+      totalTime: DataModule.generateMyTime(0, 0),
+      remainingTime: DataModule.generateMyTime(0, 0),
       categoryTimes: [],
       text: ''
     };
 
     return item;
+  }
+  private static generateEmptyInputTimes(): CustomTypes.InputTimes {
+    return {
+      totalTime: DataModule.generateMyTime(0, 0),
+      baseTime: DataModule.generateMyTime(0, 0)
+    };
+  }
+
+  private static generateEmptyAccumulationTimes(): CustomTypes.AccumulationTimes {
+    return {
+      totalTime: DataModule.generateMyTime(0, 0),
+      remainingTime: DataModule.generateMyTime(0, 0)
+    };
+  }
+
+  private static generateEmptyMyMonth(): CustomTypes.MyMonth {
+    return {
+      firstDate: null,
+      lastDate: null,
+      weeks: []
+    };
+  }
+
+  private static generateMyTime(hours: number, minutes: number): CustomTypes.MyTime {
+    return {
+      strHours: ('00' + hours).slice(-2),
+      strMinutes: ('00' + minutes).slice(-2),
+      hours: hours,
+      minutes: 0
+    };
   }
 
   private static setCategoryInit(
@@ -171,7 +215,7 @@ class DataModule extends VuexModule {
     categoryNames: string[]
   ): CustomTypes.MyDay {
     categoryNames.forEach((weekString: string) => {
-      item.categoryTimes.push({ strHours: '00', strMinutes: '00', hours: 0, minutes: 0 });
+      item.categoryTimes.push(DataModule.generateMyTime(0, 0));
     });
     return item;
   }
@@ -180,7 +224,7 @@ class DataModule extends VuexModule {
     var targetYear = date.getFullYear();
     var targetMonth = date.getMonth() + 1;
     var targetDate = date.getDate();
-    return targetYear + '-' + ('00' + targetMonth).slice(-2) + '-' + ('00' + targetDate).slice(-2);
+    return targetYear + '/' + ('00' + targetMonth).slice(-2) + '/' + ('00' + targetDate).slice(-2);
   }
   private static isToday(dt: Date): boolean {
     const _today: Date = new Date(Date.now());
@@ -188,12 +232,21 @@ class DataModule extends VuexModule {
   }
   @Action
   public calc() {
-    for (const [key, value] of Object.entries(this._days)) {
-      console.log(key, value.keyDayString, value.date);
-      if (!value.isTarget) {
+    var totalTimeMinutes = 0;
+    for (const [key, item] of Object.entries(this._days)) {
+      console.log(key, item.keyDayString, item.date);
+      if (!item.isTarget) {
         continue;
       }
+      totalTimeMinutes += item.planTime.hours * 60;
+      totalTimeMinutes += item.planTime.minutes;
     }
+    var h = Math.floor(totalTimeMinutes / 60);
+    var m = totalTimeMinutes % 60;
+    console.log('calc', h, m);
+    var accumulationTimes = DataModule.generateEmptyAccumulationTimes();
+    accumulationTimes.totalTime = DataModule.generateMyTime(h, m);
+    this.setAccumulationTimes(accumulationTimes);
   }
 }
 export default getModule(DataModule);

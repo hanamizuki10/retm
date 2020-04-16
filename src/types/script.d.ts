@@ -11,6 +11,14 @@ declare namespace CustomTypes {
     [key: string]: MyDay;
   }
 
+  export interface InputTimes {
+    totalTime: MyTime;
+    baseTime: MyTime;
+  }
+  export interface AccumulationTimes {
+    totalTime: MyTime;
+    remainingTime: MyTime;
+  }
   export interface MyMonth {
     firstDate: Date | null;
     lastDate: Date | null;
