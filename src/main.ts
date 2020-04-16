@@ -4,7 +4,6 @@ import store from './store';
 import vuetify from './plugins/vuetify';
 import gasPlugin from './plugins/gas';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
-import '@mdi/font/css/materialdesignicons.css';
 
 Vue.config.productionTip = false;
 gasPlugin();
