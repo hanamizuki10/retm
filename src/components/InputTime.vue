@@ -80,6 +80,7 @@ export default class InputTime extends Vue {
   margin: 0px;
   padding: 0px;
   border-bottom: 0.5px solid #bbbbbb;
+  display: inline;
 }
 input {
   margin: 0px;
