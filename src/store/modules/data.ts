@@ -214,13 +214,30 @@ class DataModule extends VuexModule {
       weeks: []
     };
   }
+  private static generateMyTimeByMinutes(minutes: number): CustomTypes.MyTime {
+    var isMinus = false;
+    if (minutes < 0) {
+      isMinus = true;
+      minutes = Math.abs(minutes);
+    }
+    var h = Math.floor(minutes / 60);
+    console.log(minutes / 60);
+    console.log(minutes % 60);
+    var m = minutes % 60;
+    var time = DataModule.generateMyTime(h, m);
+    if (isMinus) {
+      time.strHours = '-' + time.strHours;
+      time.hours = -1 * time.hours;
+    }
+    return time;
+  }
 
   private static generateMyTime(hours: number, minutes: number): CustomTypes.MyTime {
     return {
       strHours: ('00' + hours).slice(-2),
       strMinutes: ('00' + minutes).slice(-2),
       hours: hours,
-      minutes: 0
+      minutes: minutes
     };
   }
 
@@ -246,21 +263,29 @@ class DataModule extends VuexModule {
   }
   @Action
   public calc() {
+    var planTotalTimeMinutes = this._inputTimes.totalTime.hours * 60;
+    planTotalTimeMinutes += this._inputTimes.totalTime.minutes;
+
     var totalTimeMinutes = 0;
-    for (const [key, item] of Object.entries(this._days)) {
+    var newDays = Object.assign({}, this._days);
+    for (const [key, item] of Object.entries(newDays)) {
       console.log(key, item.keyDayString, item.date);
       if (!item.isTarget) {
         continue;
       }
       totalTimeMinutes += item.planTime.hours * 60;
       totalTimeMinutes += item.planTime.minutes;
+      var remainingTime = planTotalTimeMinutes - totalTimeMinutes;
+      item.totalTime = DataModule.generateMyTimeByMinutes(totalTimeMinutes);
+      item.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
+      newDays[key] = item;
     }
-    var h = Math.floor(totalTimeMinutes / 60);
-    var m = totalTimeMinutes % 60;
-    console.log('calc', h, m);
+    var remainingTime = planTotalTimeMinutes - totalTimeMinutes;
     var accumulationTimes = DataModule.generateEmptyAccumulationTimes();
-    accumulationTimes.totalTime = DataModule.generateMyTime(h, m);
+    accumulationTimes.totalTime = DataModule.generateMyTimeByMinutes(totalTimeMinutes);
+    accumulationTimes.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
     this.setAccumulationTimes(accumulationTimes);
+    this.setMyDays(newDays);
   }
 }
 export default getModule(DataModule);
