@@ -39,15 +39,26 @@ export default class InputTime extends Vue {
 
   private inputHours(event: Event) {
     console.log('inputHours', this.limitLength);
+
+    // 入力値に:が含まれていたら無条件で右側に移動
+    var isforcusMinutes = false;
+    if (':' === this.value.strHours.slice(-1)) {
+      this.value.strHours = this.value.strHours.slice(0, -1);
+      isforcusMinutes = true;
+    }
+
     const charLength = String(this.value.strHours).length;
     this.value.hours = parseInt(this.value.strHours, 10); // TODO:数値以外の入力対策
     console.log('inputHours', this.limitLength, charLength);
     console.log(charLength === this.limitLength);
     if (charLength === this.limitLength) {
       // ２文字入力された事を感知したら分へ移動
-      this.forcusMinutes();
+      isforcusMinutes = true;
     }
     this.$emit('input', this.value);
+    if (isforcusMinutes) {
+      this.forcusMinutes();
+    }
   }
 
   private inputMinutes(event: Event) {
