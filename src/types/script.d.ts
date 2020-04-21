@@ -14,6 +14,10 @@ declare namespace CustomTypes {
   export interface InputTimes {
     totalTime: MyTime;
     baseTime: MyTime;
+    startDate: Date;
+    startYear: number;
+    startMonth: number;
+    startDay: number;
   }
   export interface AccumulationTimes {
     totalTime: MyTime;
@@ -29,11 +33,13 @@ declare namespace CustomTypes {
   }
   export interface MyDay {
     date: Date;
+    month: number;
     day: number;
     keyDayString: string;
     isTarget: boolean;
     isCurrent: boolean;
     isHoliday: boolean;
+    //isLock: boolean;  // TODO:自動入力
     holidayName: string;
     week: string;
     planTime: MyTime;

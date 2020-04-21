@@ -13,28 +13,29 @@
     <v-content>
       <v-container>
         <v-row>
-          <v-col>←</v-col>
-          <v-col>2020年</v-col>
-          <v-col>1月</v-col>
-          <v-col>2月</v-col>
-          <v-col>3月</v-col>
-          <v-col>4月</v-col>
-          <v-col>5月</v-col>
-          <v-col>6月</v-col>
-          <v-col>7月</v-col>
-          <v-col>8月</v-col>
-          <v-col>9月</v-col>
-          <v-col>10月</v-col>
-          <v-col>11月</v-col>
-          <v-col>12月</v-col>
-          <v-col>→</v-col>
+          <v-col>
+            <v-btn rounded @click="changeMonth(0)">＜</v-btn>
+            <v-btn rounded :disabled="isDisabled(1)" @click="changeMonth(1)">1月</v-btn>
+            <v-btn rounded :disabled="isDisabled(2)" @click="changeMonth(2)">2月</v-btn>
+            <v-btn rounded :disabled="isDisabled(3)" @click="changeMonth(3)">3月</v-btn>
+            <v-btn rounded :disabled="isDisabled(4)" @click="changeMonth(4)">4月</v-btn>
+            <v-btn rounded :disabled="isDisabled(5)" @click="changeMonth(5)">5月</v-btn>
+            <v-btn rounded :disabled="isDisabled(6)" @click="changeMonth(6)">6月</v-btn>
+            <v-btn rounded :disabled="isDisabled(7)" @click="changeMonth(7)">7月</v-btn>
+            <v-btn rounded :disabled="isDisabled(8)" @click="changeMonth(8)">8月</v-btn>
+            <v-btn rounded :disabled="isDisabled(9)" @click="changeMonth(9)">9月</v-btn>
+            <v-btn rounded :disabled="isDisabled(10)" @click="changeMonth(10)">10月</v-btn>
+            <v-btn rounded :disabled="isDisabled(11)" @click="changeMonth(11)">11月</v-btn>
+            <v-btn rounded :disabled="isDisabled(12)" @click="changeMonth(12)">12月</v-btn>
+            <v-btn rounded @click="changeMonth(13)">＞</v-btn>
+          </v-col>
         </v-row>
       </v-container>
       <v-container>
         <v-row>
           <v-col>
             <v-menu
-              v-model="menu"
+              v-model="datePickerMenu"
               :close-on-content-click="false"
               :nudge-right="40"
               transition="scale-transition"
@@ -43,14 +44,19 @@
             >
               <template v-slot:activator="{ on }">
                 <v-text-field
-                  v-model="datePickerDate"
+                  v-model="startDay"
                   label="毎月の起点日"
                   readonly
                   v-on="on"
                 ></v-text-field>
               </template>
-              <v-date-picker v-model="datePickerDate" @input="menu = false" locale="ja-JP">
-              </v-date-picker>
+              <v-date-picker
+                v-model="startDate"
+                @change="changeDatePicker"
+                @input="datePickerMenu = false"
+                locale="ja-JP"
+                :day-format="date => new Date(date).getDate()"
+              ></v-date-picker>
             </v-menu>
           </v-col>
           <v-col>
@@ -60,27 +66,31 @@
           </v-col>
           <v-col>
             <!-- TODO: 総時間 -->
-            <label class="v-label v-label--active theme--light caption">総時間</label>
-            <InputTime v-model="totalTime" :limitLength="3" />
-          </v-col>
-          <v-col>
-            <!-- TODO: 日々の分割時間目安 -->
-            <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
-            <InputTime v-model="baseTime" />
+            <label class="v-label v-label--active theme--light caption">総時間</label><br />
+            <InputTime v-model="totalTime" :limit-length="3" @input="inputTotalTime" />
           </v-col>
           <v-col>
             <!-- TODO: 累積時間 -->
-            <label class="v-label v-label--active theme--light caption">累積時間</label>
-            <InputTime v-model="accumulationTotalTime" color="#cccccc" :limitLength="3" />
+            <label class="v-label v-label--active theme--light caption">累積時間</label><br />
+            <InputTime v-model="accumulationTotalTime" />
           </v-col>
           <v-col>
             <!-- TODO: 残時間 -->
-            <label class="v-label v-label--active theme--light caption">残時間</label>
-            <InputTime v-model="accumulationRemainingTime" color="#cccccc" :limitLength="3" />
+            <label class="v-label v-label--active theme--light caption">残時間</label><br />
+            <InputTime v-model="accumulationRemainingTime" />
           </v-col>
           <v-spacer></v-spacer>
           <v-col>
             <v-btn large color="info" @click="showHolidays">日本の祝日を適用</v-btn>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <!-- TODO: 日々の分割時間目安 -->
+            便利機能、自動入力
+            <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
+            <InputTime v-model="baseTime" @input="inputBaseTime" />
+            <v-btn large color="info">自動入力</v-btn>
           </v-col>
         </v-row>
         <v-row>
@@ -95,6 +105,7 @@
           </v-col>
         </v-row>
       </v-container>
+      {{ startYear }}年{{ startMonth }}月
       <Calendar />
     </v-content>
   </v-app>
@@ -113,8 +124,8 @@ import InputTime from './components/InputTime.vue';
   }
 })
 export default class App extends Vue {
-  private datePickerDate = new Date().toISOString().substr(0, 10);
-  private menu = false;
+  private startDate = new Date().toISOString().substr(0, 10);
+  private datePickerMenu = false;
 
   get isInputHoliday(): boolean {
     return calendardata.moduleIsInputHoliday;
@@ -142,13 +153,24 @@ export default class App extends Vue {
     return calendardata.moduleCategoryNames;
   }
   get totalTime(): CustomTypes.MyTime {
-    return { strHours: '126', strMinutes: '30', hours: 126, minutes: 30 };
+    return calendardata.moduleInputTimes.totalTime;
   }
   get baseTime(): CustomTypes.MyTime {
-    return { strHours: '07', strMinutes: '30', hours: 7, minutes: 30 };
+    return calendardata.moduleInputTimes.baseTime;
   }
-
+  get startYear(): number {
+    return calendardata.moduleInputTimes.startYear;
+  }
+  get startMonth(): number {
+    console.log('startMonth', calendardata.moduleInputTimes.startMonth);
+    return calendardata.moduleInputTimes.startMonth;
+  }
+  get startDay(): number {
+    console.log('startDay', calendardata.moduleInputTimes.startDay);
+    return calendardata.moduleInputTimes.startDay;
+  }
   get accumulationTotalTime(): CustomTypes.MyTime {
+    console.log('startMonth', calendardata.moduleInputTimes.startMonth);
     return calendardata.moduleAccumulationTimes.totalTime;
   }
 
@@ -158,16 +180,10 @@ export default class App extends Vue {
 
   created() {
     // 初期値では今日を起点とした日付で情報を表示する
-    const date = new Date(this.datePickerDate);
+    const date = new Date(this.startDate);
     calendardata.createCalendar(date);
   }
 
-  @Watch('datePickerDate')
-  private changeStartDay() {
-    console.log(this.datePickerDate);
-    const date = new Date(this.datePickerDate);
-    calendardata.createCalendar(date);
-  }
   @Watch('data')
   private changeCalendardata() {
     console.log('changeCalendardata');
@@ -175,10 +191,46 @@ export default class App extends Vue {
   private changeIsInputHoliday(event: Event) {
     calendardata.setIsInputHoliday(!this.isInputHoliday);
   }
+  private inputTotalTime(event: Event) {
+    console.log('inputTotalTime-totalTime', this.totalTime.strHours, this.totalTime.strMinutes);
+    console.log('inputTotalTime-baseTime', this.baseTime.strHours, this.baseTime.strMinutes);
+    calendardata.calc();
+  }
+  private inputBaseTime(event: Event) {
+    console.log('inputBaseTime-totalTime', this.totalTime.strHours, this.totalTime.strMinutes);
+    console.log('inputBaseTime-baseTime', this.baseTime.strHours, this.baseTime.strMinutes);
+  }
+  private isDisabled(month: number): boolean {
+    return this.startMonth === month;
+  }
+  private changeMonth(newTargetMonth: number) {
+    console.log('changeMonth', newTargetMonth);
+    const nowStartDate = new Date(this.startDate);
+    var targetYear = nowStartDate.getFullYear();
+    var targetMonth = newTargetMonth;
+    var targetDate = nowStartDate.getDate();
+    if (newTargetMonth === 0) {
+      // 前年の12月へ
+      targetYear -= 1;
+      newTargetMonth = 12;
+    } else if (newTargetMonth === 13) {
+      // 次年の1月へ
+      targetYear += 1;
+      newTargetMonth = 1;
+    }
+    const date =
+      targetYear + '-' + ('00' + targetMonth).slice(-2) + '-' + ('00' + targetDate).slice(-2);
+    calendardata.setStartDate(date);
+    this.startDate = date;
+  }
+  private changeDatePicker(date: string) {
+    console.log('changeDatePicker', date);
+    calendardata.setStartDate(date);
+  }
 
   private showHolidays() {
     // 日本の祝日を適用ボタンを押されたら、データを取得してカレンダーに反映させる。
-    var currentYear = new Date(this.datePickerDate).getFullYear();
+    var currentYear = new Date(this.startDate).getFullYear();
     var strStartDate = currentYear - 1 + '/01/01';
     var strEndDate = currentYear + 1 + '/12/31';
     var _this = this;
