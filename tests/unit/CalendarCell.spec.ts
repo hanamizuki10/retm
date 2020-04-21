@@ -12,6 +12,7 @@ describe('CalendarCell.vue', () => {
       isTarget: false,
       isCurrent: false,
       isHoliday: false, // TODO
+      isLock: false,
       holidayName: '', // TODO
       week: '土',
       planTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },

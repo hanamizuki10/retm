@@ -39,7 +39,7 @@ declare namespace CustomTypes {
     isTarget: boolean;
     isCurrent: boolean;
     isHoliday: boolean;
-    //isLock: boolean;  // TODO:自動入力
+    isLock: boolean;
     holidayName: string;
     week: string;
     planTime: MyTime;

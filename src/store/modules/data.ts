@@ -187,6 +187,7 @@ class DataModule extends VuexModule {
       isTarget: isTarget,
       isCurrent: this.isToday(dt),
       isHoliday: false,
+      isLock: false,
       holidayName: '',
       week: week,
       planTime: DataModule.generateMyTime(0, 0),
@@ -323,7 +324,10 @@ class DataModule extends VuexModule {
       if (!item.isTarget) {
         continue;
       }
-      if (item.isHoliday) {
+      if (item.isLock) {
+        continue;
+      }
+      if (item.isHoliday || '土' == item.week || '日' == item.week) {
         // 休日
         if (!this._isInputHoliday) {
           // 休日は入力しないモード
@@ -344,6 +348,20 @@ class DataModule extends VuexModule {
     }
     this.setMyDays(newDays);
     this.calc();
+  }
+  @Action
+  public resetTimes(keyDayString: string) {
+    var newDays = Object.assign({}, this._days);
+    newDays[keyDayString].planTime = DataModule.generateMyTime(0, 0);
+    newDays[keyDayString].categoryTimes = [];
+    this.setMyDays(newDays);
+    this.calc();
+  }
+  @Action
+  public changeLock(keyDayString: string) {
+    var newDays = Object.assign({}, this._days);
+    newDays[keyDayString].isLock = !newDays[keyDayString].isLock;
+    this.setMyDays(newDays);
   }
 }
 export default getModule(DataModule);

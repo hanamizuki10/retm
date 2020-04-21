@@ -1,6 +1,15 @@
 <template>
   <v-container class="calendar-cell">
     <v-row>
+      <v-col>
+        <input type="checkbox" id="isLock" :checked="item.isLock" @change="lock" />
+        <label for="isLock">Lock</label>
+      </v-col>
+      <v-col>
+        <v-btn small @click="reset">リセット</v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col class="text-align-left">
         <label v-if="item.day === 1" class="caption">{{ item.month }}/</label>
         {{ item.day }}
@@ -72,6 +81,14 @@ export default class CalendarCell extends Vue {
     // 累積時間、残時間の再計算を行う
     calendardata.calc();
     console.log('this.item.planTime', this.item.planTime);
+  }
+  private lock() {
+    console.log('自動入力不可');
+    calendardata.changeLock(this.keyDayString);
+  }
+  private reset() {
+    console.log('入力値を初期化');
+    calendardata.resetTimes(this.keyDayString);
   }
 }
 </script>
