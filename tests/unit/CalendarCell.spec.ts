@@ -6,6 +6,7 @@ describe('CalendarCell.vue', () => {
 
     const data: CustomTypes.MyDay = {
       date: new Date(2020, 0, 1),
+      month: 1,
       day: 1,
       keyDayString: '2020-01-01',
       isTarget: false,

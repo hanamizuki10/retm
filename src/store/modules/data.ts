@@ -53,6 +53,10 @@ class DataModule extends VuexModule {
     this._data = data;
   }
   @Mutation
+  public setInputTimes(inputTimes: CustomTypes.InputTimes) {
+    this._inputTimes = inputTimes;
+  }
+  @Mutation
   public setAccumulationTimes(accumulationTimes: CustomTypes.AccumulationTimes) {
     this._accumulationTimes = accumulationTimes;
   }
@@ -177,6 +181,7 @@ class DataModule extends VuexModule {
   private static generateMyDay(dt: Date, week: string, isTarget: boolean): CustomTypes.MyDay {
     const item: CustomTypes.MyDay = {
       date: dt,
+      month: dt.getMonth() + 1,
       day: dt.getDate(),
       keyDayString: this.formatDate(dt),
       isTarget: isTarget,
@@ -194,9 +199,14 @@ class DataModule extends VuexModule {
     return item;
   }
   private static generateEmptyInputTimes(): CustomTypes.InputTimes {
+    const date = new Date();
     return {
       totalTime: DataModule.generateMyTime(0, 0),
-      baseTime: DataModule.generateMyTime(0, 0)
+      baseTime: DataModule.generateMyTime(0, 0),
+      startDate: date,
+      startYear: date.getFullYear(),
+      startMonth: date.getMonth() + 1,
+      startDay: date.getDate()
     };
   }
 
@@ -233,8 +243,12 @@ class DataModule extends VuexModule {
   }
 
   private static generateMyTime(hours: number, minutes: number): CustomTypes.MyTime {
+    var strHours = String(hours);
+    if (strHours.length == 1) {
+      strHours = ('00' + strHours).slice(-2);
+    }
     return {
-      strHours: ('00' + hours).slice(-2),
+      strHours: strHours,
       strMinutes: ('00' + minutes).slice(-2),
       hours: hours,
       minutes: minutes
@@ -286,6 +300,19 @@ class DataModule extends VuexModule {
     accumulationTimes.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
     this.setAccumulationTimes(accumulationTimes);
     this.setMyDays(newDays);
+  }
+
+  @Action
+  public setStartDate(date: string) {
+    console.log('setStartDate', date);
+    var newInputTimes = Object.assign({}, this._inputTimes);
+    newInputTimes.startDate = new Date(date);
+    newInputTimes.startYear = newInputTimes.startDate.getFullYear();
+    newInputTimes.startMonth = newInputTimes.startDate.getMonth() + 1;
+    newInputTimes.startDay = newInputTimes.startDate.getDate();
+    console.log('newInputTimes', newInputTimes);
+    this.setInputTimes(newInputTimes);
+    this.createCalendar(newInputTimes.startDate);
   }
 }
 export default getModule(DataModule);

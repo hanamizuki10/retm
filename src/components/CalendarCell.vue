@@ -2,6 +2,7 @@
   <v-container class="calendar-cell">
     <v-row>
       <v-col class="text-align-left">
+        <label v-if="item.day === 1" class="caption">{{ item.month }}/</label>
         {{ item.day }}
         <label class="font-red caption">{{ item.holidayName }}</label>
       </v-col>
