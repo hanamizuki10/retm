@@ -1,25 +1,21 @@
 <template>
   <v-container class="calendar-cell">
     <v-row>
-      <v-col lg="2">{{ item.day }},{{ item.isCurrent }}</v-col>
-      <v-spacer></v-spacer>
-      <v-col md="auto" class="font-red caption">{{ item.holidayName }}</v-col>
+      <v-col class="text-align-left">
+        {{ item.day }}
+        <label class="font-red caption">{{ item.holidayName }}</label>
+      </v-col>
     </v-row>
     <div v-if="isInput">
-      <v-row style="background-color: #b0f3ff;">
-        <v-col md="auto" class="planTime">
-          <InputTime v-model="item.planTime" size="medium" color="#b0f3ff" @input="input" />
+      <v-row>
+        <v-col class="planTime">
+          <InputTime v-model="item.planTime" size="medium" @input="input" />
         </v-col>
       </v-row>
       <v-row v-for="(categoryName, index) in categoryNames" :key="categoryName">
         <v-col class="text-align-center categoryTimes">
           <label class="caption"> {{ categoryName }} </label>
-          <InputTime
-            v-model="item.categoryTimes[index]"
-            size="small"
-            color="#ffffff"
-            @input="input"
-          />
+          <InputTime v-model="item.categoryTimes[index]" size="small" @input="input" />
         </v-col>
       </v-row>
     </div>
@@ -97,6 +93,9 @@ export default class CalendarCell extends Vue {
 }
 .text-align-right {
   text-align: right;
+}
+.text-align-left {
+  text-align: left;
 }
 table.calendar v-col {
   border: none;
