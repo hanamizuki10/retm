@@ -231,8 +231,8 @@ class DataModule extends VuexModule {
       minutes = Math.abs(minutes);
     }
     var h = Math.floor(minutes / 60);
-    console.log(minutes / 60);
-    console.log(minutes % 60);
+    // console.log(minutes / 60);
+    // console.log(minutes % 60);
     var m = minutes % 60;
     var time = DataModule.generateMyTime(h, m);
     if (isMinus) {
@@ -313,6 +313,37 @@ class DataModule extends VuexModule {
     console.log('newInputTimes', newInputTimes);
     this.setInputTimes(newInputTimes);
     this.createCalendar(newInputTimes.startDate);
+  }
+
+  @Action
+  public setAutoPlanTime() {
+    console.log('setAutoPlanTime', this._inputTimes.baseTime);
+    var newDays = Object.assign({}, this._days);
+    for (const [key, item] of Object.entries(newDays)) {
+      if (!item.isTarget) {
+        continue;
+      }
+      if (item.isHoliday) {
+        // 休日
+        if (!this._isInputHoliday) {
+          // 休日は入力しないモード
+          continue;
+        }
+      }
+      item.planTime = DataModule.generateMyTime(
+        this._inputTimes.baseTime.hours,
+        this._inputTimes.baseTime.minutes
+      );
+      console.log(
+        item.keyDayString,
+        item.planTime.strHours,
+        item.planTime.strMinutes,
+        item.holidayName
+      );
+      newDays[key] = item;
+    }
+    this.setMyDays(newDays);
+    this.calc();
   }
 }
 export default getModule(DataModule);

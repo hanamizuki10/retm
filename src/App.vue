@@ -90,7 +90,7 @@
             便利機能、自動入力
             <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
             <InputTime v-model="baseTime" @input="inputBaseTime" />
-            <v-btn large color="info">自動入力</v-btn>
+            <v-btn large color="info" @click="autoInput">自動入力</v-btn>
           </v-col>
         </v-row>
         <v-row>
@@ -200,6 +200,11 @@ export default class App extends Vue {
     console.log('inputBaseTime-totalTime', this.totalTime.strHours, this.totalTime.strMinutes);
     console.log('inputBaseTime-baseTime', this.baseTime.strHours, this.baseTime.strMinutes);
   }
+
+  private autoInput() {
+    calendardata.setAutoPlanTime();
+  }
+
   private isDisabled(month: number): boolean {
     return this.startMonth === month;
   }
