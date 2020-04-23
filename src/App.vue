@@ -11,7 +11,23 @@
     </v-app-bar>
 
     <v-content>
+      <span class="group pa-2">
+        <v-icon color="green darken-2">mdi-calendar-today</v-icon>
+        <v-icon>mdi-event</v-icon>
+        <v-icon>mdi-calendar-today</v-icon>
+        <v-icon>mdi-lock</v-icon>
+        <v-icon>mdi-lock-open</v-icon>
+        <v-icon>mdi-checkbox-marked-circle</v-icon>
+      </span>
+      <v-icon>mdi-calendar-remove</v-icon>
       <v-container>
+        <v-row>
+          <v-col>
+            <div class="text-center">
+              <v-pagination v-model="page" :length="12"></v-pagination>
+            </div>
+          </v-col>
+        </v-row>
         <v-row>
           <v-col>
             <v-btn rounded @click="changeMonth(0)">＜</v-btn>
@@ -46,6 +62,7 @@
                 <v-text-field
                   v-model="startDay"
                   label="毎月の起点日"
+                  prepend-icon="mdi-calendar-today"
                   readonly
                   v-on="on"
                 ></v-text-field>
@@ -87,7 +104,6 @@
         <v-row>
           <v-col>
             <!-- TODO: 日々の分割時間目安 -->
-            便利機能、自動入力
             <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
             <InputTime v-model="baseTime" @input="inputBaseTime" />
             <v-btn large color="info" @click="autoInput">自動入力</v-btn>
@@ -101,7 +117,8 @@
               :checked="isInputHoliday"
               @change="changeIsInputHoliday"
             />
-            <label for="isInputHoliday">土日祝日も入力モードとするか</label>
+            <label for="isInputHoliday">土日祝日も入力モードとする</label>
+            <CategoryEdit />
           </v-col>
         </v-row>
       </v-container>
@@ -116,16 +133,30 @@ import { Component, Vue, Watch } from 'vue-property-decorator';
 import calendardata from './store/modules/data';
 import Calendar from './components/Calendar.vue';
 import InputTime from './components/InputTime.vue';
+import CategoryEdit from './components/CategoryEdit.vue';
 
 @Component({
   components: {
     Calendar,
+    CategoryEdit,
     InputTime
   }
 })
 export default class App extends Vue {
   private startDate = new Date().toISOString().substr(0, 10);
   private datePickerMenu = false;
+  private checkbox = true;
+
+  @Watch('data')
+  private changeCalendardata() {
+    console.log('changeCalendardata');
+  }
+
+  created() {
+    // 初期値では今日を起点とした日付で情報を表示する
+    const date = new Date(this.startDate);
+    calendardata.createCalendar(date);
+  }
 
   get isInputHoliday(): boolean {
     return calendardata.moduleIsInputHoliday;
@@ -178,16 +209,6 @@ export default class App extends Vue {
     return calendardata.moduleAccumulationTimes.remainingTime;
   }
 
-  created() {
-    // 初期値では今日を起点とした日付で情報を表示する
-    const date = new Date(this.startDate);
-    calendardata.createCalendar(date);
-  }
-
-  @Watch('data')
-  private changeCalendardata() {
-    console.log('changeCalendardata');
-  }
   private changeIsInputHoliday(event: Event) {
     calendardata.setIsInputHoliday(!this.isInputHoliday);
   }
@@ -224,7 +245,8 @@ export default class App extends Vue {
       newTargetMonth = 1;
     }
     const date =
-      targetYear + '-' + ('00' + targetMonth).slice(-2) + '-' + ('00' + targetDate).slice(-2);
+      targetYear + '-' + ('00' + newTargetMonth).slice(-2) + '-' + ('00' + targetDate).slice(-2);
+    console.log('切り替え', date);
     calendardata.setStartDate(date);
     this.startDate = date;
   }

@@ -1,14 +1,5 @@
 <template>
-  <v-container class="calendar-cell">
-    <v-row>
-      <v-col>
-        <input type="checkbox" id="isLock" :checked="item.isLock" @change="lock" />
-        <label for="isLock">Lock</label>
-      </v-col>
-      <v-col>
-        <v-btn small @click="reset">リセット</v-btn>
-      </v-col>
-    </v-row>
+  <v-container fluid class="calendar-cell">
     <v-row>
       <v-col class="text-align-left">
         <label v-if="item.day === 1" class="caption">{{ item.month }}/</label>
@@ -30,14 +21,16 @@
       </v-row>
     </div>
     <div v-if="item.isTarget">
-      <v-row>
-        <v-col class="text-align-right caption">
-          総時間 {{ item.totalTime.strHours + ':' + item.totalTime.strMinutes }}
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="text-align-right caption">
-          残時間 {{ item.remainingTime.strHours + ':' + item.remainingTime.strMinutes }}
+      <v-row class="d-flex justify-space-between">
+        <v-col>
+          <div v-if="isInput">
+            <v-icon size="25" @click="lock" :color="isLockIconColor">{{ isLockIcon }}</v-icon>
+            <v-icon size="25" @click="reset">mdi-eraser</v-icon>
+          </div>
+          <div class="text-align-right caption">
+            総時間 {{ item.totalTime.strHours + ':' + item.totalTime.strMinutes }}<br />
+            残時間 {{ item.remainingTime.strHours + ':' + item.remainingTime.strMinutes }}
+          </div>
         </v-col>
       </v-row>
     </div>
@@ -76,6 +69,18 @@ export default class CalendarCell extends Vue {
 
   get item(): CustomTypes.MyDay {
     return calendardata.moduleDays[this.keyDayString];
+  }
+  get isLockIcon(): string {
+    if (this.item.isLock) {
+      return 'mdi-lock';
+    }
+    return 'mdi-lock-open';
+  }
+  get isLockIconColor(): string {
+    if (this.item.isLock) {
+      return '';
+    }
+    return 'orange darken-2';
   }
   private input(event: Event) {
     // 累積時間、残時間の再計算を行う
