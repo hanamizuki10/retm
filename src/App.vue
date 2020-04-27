@@ -82,17 +82,14 @@
             日数指定なのか
           </v-col>
           <v-col>
-            <!-- TODO: 総時間 -->
             <label class="v-label v-label--active theme--light caption">総時間</label><br />
             <InputTime v-model="totalTime" :limit-length="3" @input="inputTotalTime" />
           </v-col>
           <v-col>
-            <!-- TODO: 累積時間 -->
             <label class="v-label v-label--active theme--light caption">累積時間</label><br />
             <InputTime v-model="accumulationTotalTime" />
           </v-col>
           <v-col>
-            <!-- TODO: 残時間 -->
             <label class="v-label v-label--active theme--light caption">残時間</label><br />
             <InputTime v-model="accumulationRemainingTime" />
           </v-col>
@@ -103,7 +100,6 @@
         </v-row>
         <v-row>
           <v-col>
-            <!-- TODO: 日々の分割時間目安 -->
             <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
             <InputTime v-model="baseTime" @input="inputBaseTime" />
             <v-btn large color="info" @click="autoInput">自動入力</v-btn>
