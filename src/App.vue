@@ -245,10 +245,9 @@ export default class App extends Vue {
     str += '\r\n';
     this.dataweeks.forEach((week: CustomTypes.MyWeek) => {
       week.days.forEach((day: string) => {
-        str += _this.days[day].date.getDate();
+        str += _this.days[day].day;
         str += '\t';
         str += '\t';
-        str += _this.days[day].text;
         str += '\t';
         str += _this.days[day].holidayName;
         str += '\t';
@@ -290,6 +289,14 @@ export default class App extends Vue {
         str += '\t';
         str += _this.days[day].remainingTime.hours;
         str += ':' + _this.days[day].remainingTime.minutes;
+        str += '\t';
+      });
+      str += '\r\n';
+      week.days.forEach((day: string) => {
+        str += _this.days[day].text;
+        str += '\t';
+        str += '\t';
+        str += '\t';
         str += '\t';
       });
       str += '\r\n';
