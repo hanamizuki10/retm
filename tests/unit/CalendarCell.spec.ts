@@ -15,14 +15,10 @@ describe('CalendarCell.vue', () => {
       isLock: false,
       holidayName: '', // TODO
       week: '土',
-      planTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
-      totalTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      scheduledTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
+      cumulativeTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
       remainingTime: { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
-      categoryTimes: [
-        { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
-        { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 },
-        { strHours: '00', strMinutes: '00', hours: 0, minutes: 0 }
-      ],
+      categories: {},
       text: ''
     };
     const categoryNames = ['A', 'M', '他'];

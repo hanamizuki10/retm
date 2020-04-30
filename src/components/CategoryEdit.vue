@@ -1,86 +1,81 @@
 <template>
   <div class="text-center">
-    <v-dialog v-model="dialog" width="300">
-      <template v-slot:activator="{ on }">
-        <v-btn color="red lighten-2" dark v-on="on">
-          カテゴリー編集
-        </v-btn>
-      </template>
+    <v-card>
+      <v-card-title class="subtitle-2">
+        カテゴリー編集
+      </v-card-title>
 
-      <v-card>
-        <v-card-title class="headline grey lighten-2" primary-title>
-          カテゴリー編集
-        </v-card-title>
+      <v-card-text>
+        <v-text-field
+          v-model="newCategoryName"
+          class="subtitle-2"
+          label="追加するカテゴリ略称"
+          append-icon="mdi-plus-box"
+          @click:append="addCategoryName"
+        ></v-text-field>
+        <v-list dense>
+          <v-subheader>登録済みのカテゴリー一覧</v-subheader>
+          <v-list-item-group color="primary">
+            <v-list-item v-for="(category, index) in categories" :key="index">
+              <v-list-item-content>
+                <v-list-item-title v-text="category.name"></v-list-item-title>
+              </v-list-item-content>
+              <v-list-item-content>
+                <label class="v-label v-label--active theme--light caption">予定総時間</label>
+                <InputTime v-model="category.scheduledTime" @input="input" />
+              </v-list-item-content>
+              <v-list-item-content>
+                <label class="v-label v-label--active theme--light caption">累積総時間</label>
+                <InputTime v-model="category.actualTime" :readonly="true" />
+              </v-list-item-content>
+              <v-list-item-content>
+                <label class="v-label v-label--active theme--light caption">残時間</label>
+                <InputTime v-model="category.remainingTime" :readonly="true" />
+              </v-list-item-content>
+              <v-list-item-icon @click="delCategory">
+                <v-icon :data-category-name="category.name">mdi-delete</v-icon>
+              </v-list-item-icon>
+            </v-list-item>
+          </v-list-item-group>
+        </v-list>
+      </v-card-text>
 
-        <v-card-text>
-          <v-text-field
-            v-model="newCategoryName"
-            label="追加するカテゴリ略称"
-            append-icon="mdi-plus-box"
-            @click:append="addCategoryName"
-            @keydown="keydownTextField"
-          ></v-text-field>
-          <v-list dense>
-            <v-subheader>登録済みのカテゴリー一覧</v-subheader>
-            <v-list-item-group color="primary">
-              <v-list-item
-                v-for="(categoryName, i) in categoryNames"
-                :key="i"
-                @click="delCategoryName"
-              >
-                <v-list-item-content>
-                  <v-list-item-title v-text="categoryName"></v-list-item-title>
-                </v-list-item-content>
-                <v-list-item-icon>
-                  <v-icon>mdi-delete</v-icon>
-                </v-list-item-icon>
-              </v-list-item>
-            </v-list-item-group>
-          </v-list>
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="dialog = false">
-            OK
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+      <v-divider></v-divider>
+    </v-card>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
 import calendardata from '../store/modules/data';
+import InputTime from './InputTime.vue';
 
-@Component
+@Component({
+  components: {
+    InputTime
+  }
+})
 export default class CategoryEdit extends Vue {
-  private dialog = false;
   private newCategoryName: string = '';
-  get categoryNames(): string[] {
-    return calendardata.moduleCategoryNames;
+
+  get categories(): CustomTypes.Category[] {
+    return calendardata.moduleCategories;
   }
-  private keydownTextField(event: KeyboardEvent) {
-    console.log(event.key);
-    if (event.key === 'Enter') {
-      if (this.newCategoryName.trim() !== '') {
-        calendardata.addCategoryName(this.newCategoryName);
-        this.newCategoryName = '';
-      }
-    }
-  }
+
   private addCategoryName() {
     console.log('addCategoryName', this.newCategoryName);
-    calendardata.addCategoryName(this.newCategoryName);
+    calendardata.addCategory(this.newCategoryName);
     this.newCategoryName = '';
   }
-  private delCategoryName(event: MouseEvent) {
-    const categoryName = (event.target as HTMLElement).innerText;
-    console.log('delCategoryName', event, categoryName);
-    calendardata.removeCategoryName(categoryName);
+  private delCategory(event: MouseEvent) {
+    const categoryName = (event.target as HTMLElement).getAttribute('data-category-name');
+    console.log('delCategory', event, categoryName);
+    if (categoryName) {
+      calendardata.removeCategory(categoryName);
+    }
+  }
+  private input() {
+    calendardata.calc();
   }
 }
 </script>

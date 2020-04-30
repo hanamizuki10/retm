@@ -60,7 +60,7 @@ div.calendar div.col {
   min-width: 166px;
 }
 .not-target {
-  background-color: darkgray;
+  background-color: lightgrey;
 }
 .saturday {
   background-color: aqua;
