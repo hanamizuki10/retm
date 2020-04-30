@@ -6,7 +6,7 @@
         <label class="overline">{{ aliasName }}</label>
       </v-col>
     </v-row>
-    <div v-if="isInput">
+    <div v-show="isInput">
       <v-row>
         <v-col class="scheduledTime">
           <InputTime v-model="item.scheduledTime" size="medium" @input="input" />
@@ -24,7 +24,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-text-field v-model="item.text" dense class="caption" @input="input" />
+          <v-text-field v-model="item.text" dense class="caption" @input="input" hide-details />
         </v-col>
       </v-row>
     </div>
@@ -32,8 +32,22 @@
       <v-row>
         <v-col class="d-flex justify-space-between">
           <div v-if="isInput" class="d-inline-block justify-sm-start">
-            <v-icon size="25" @click="lock" :color="isLockIconColor">{{ isLockIcon }}</v-icon>
-            <v-icon size="25" @click="reset">mdi-eraser</v-icon>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-icon size="25" @click="lock" v-on="on" :color="getIsLockIconColor">
+                  {{ isLockIcon }}
+                </v-icon>
+              </template>
+              <span>{{ getLockIconTooltip }}</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-icon size="25" @click="reset" v-on="on" :color="getIsEraserColor">
+                  mdi-eraser
+                </v-icon>
+              </template>
+              <span>入力内容をクリアする</span>
+            </v-tooltip>
           </div>
           <div></div>
           <div class="d-inline-block caption justify-sm-end" cols="8">
@@ -80,7 +94,6 @@ export default class CalendarCell extends Vue {
     }
     return true;
   }
-
   get item(): CustomTypes.MyDay {
     return calendardata.moduleDays[this.keyDayString];
   }
@@ -118,12 +131,33 @@ export default class CalendarCell extends Vue {
     }
     return 'mdi-lock-open';
   }
-  get isLockIconColor(): string {
+  get getIsLockIconColor(): string {
     if (this.item.isLock) {
       return '';
     }
-    return 'orange darken-2';
+    return 'lime lighten-4';
   }
+  get getLockIconTooltip(): string {
+    if (this.item.isLock) {
+      return '目安時間の自動入力を許可する';
+    }
+    return '目安時間の自動入力を許可しない';
+  }
+  get getIsEraserColor(): string {
+    var inputValue = this.item.scheduledTime.hours;
+    inputValue += this.item.scheduledTime.minutes;
+    this.categories.forEach((c: CustomTypes.Category) => {
+      inputValue += this.item.categories[c.name].scheduledTime.hours;
+      inputValue += this.item.categories[c.name].scheduledTime.minutes;
+    });
+
+    if (inputValue == 0) {
+      // 未入力
+      return '';
+    }
+    return 'blue lighten-4';
+  }
+
   private input(event: Event) {
     // 累積時間、残時間の再計算を行う
     calendardata.calc();
