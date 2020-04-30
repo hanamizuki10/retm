@@ -10,111 +10,80 @@ import store from '@/store/';
 })
 class DataModule extends VuexModule {
   private _weekStrings = ['日', '月', '火', '水', '木', '金', '土'];
-  private _categoryNames: string[] = [];
+  private _categories: CustomTypes.Category[] = [];
   private _inputTimes: CustomTypes.InputTimes = DataModule.generateEmptyInputTimes();
   private _isInputHoliday: boolean = false; // 土日祝日も入力モードとするか
   private _data: CustomTypes.MyMonth = DataModule.generateEmptyMyMonth();
   private _days: CustomTypes.MyDays = {};
-  private _accumulationTimes: CustomTypes.AccumulationTimes = DataModule.generateEmptyAccumulationTimes();
   private _db: AppDatabase = new Dexie('AppDatabase') as AppDatabase;
 
   @Mutation
-  public setCategoryNames(categoryNames: string[]) {
-    this._categoryNames = categoryNames;
-    // TODO:Save
-    //this._db.objects.put('categoryNames', this._categoryNames);
+  public setCategories(categories: CustomTypes.Category[]) {
+    this._categories = categories;
     this._db.objects.put({
       id: 1,
-      categoryNames: this._categoryNames,
+      categories: this._categories,
       inputTimes: this._inputTimes,
       isInputHoliday: this._isInputHoliday,
       data: this._data,
-      days: this._days,
-      accumulationTimes: this._accumulationTimes
+      days: this._days
     });
   }
+
   @Mutation
   public setInputTimes(inputTimes: CustomTypes.InputTimes) {
     this._inputTimes = inputTimes;
-    // TODO:Save
-    //this._db.objects.put('inputTimes', this._inputTimes);
     this._db.objects.put({
       id: 1,
-      categoryNames: this._categoryNames,
+      categories: this._categories,
       inputTimes: this._inputTimes,
       isInputHoliday: this._isInputHoliday,
       data: this._data,
-      days: this._days,
-      accumulationTimes: this._accumulationTimes
+      days: this._days
     });
   }
   @Mutation
   public setIsInputHoliday(isInputHoliday: boolean) {
     this._isInputHoliday = isInputHoliday;
-    // TODO:Save
-    //this._db.objects.put('isInputHoliday', this._isInputHoliday);
     this._db.objects.put({
       id: 1,
-      categoryNames: this._categoryNames,
+      categories: this._categories,
       inputTimes: this._inputTimes,
       isInputHoliday: this._isInputHoliday,
       data: this._data,
-      days: this._days,
-      accumulationTimes: this._accumulationTimes
+      days: this._days
     });
   }
   @Mutation
   public setData(data: CustomTypes.MyMonth) {
     this._data = data;
-    // TODO:Save
-    //this._db.objects.put('data', this._data);
     this._db.objects.put({
       id: 1,
-      categoryNames: this._categoryNames,
+      categories: this._categories,
       inputTimes: this._inputTimes,
       isInputHoliday: this._isInputHoliday,
       data: this._data,
-      days: this._days,
-      accumulationTimes: this._accumulationTimes
+      days: this._days
     });
   }
   @Mutation
   public setMyDays(days: CustomTypes.MyDays) {
     this._days = days;
-    // TODO:Save
-    //this._db.objects.put('days', this._days);
     this._db.objects.put({
       id: 1,
-      categoryNames: this._categoryNames,
+      categories: this._categories,
       inputTimes: this._inputTimes,
       isInputHoliday: this._isInputHoliday,
       data: this._data,
-      days: this._days,
-      accumulationTimes: this._accumulationTimes
-    });
-  }
-
-  @Mutation
-  public setAccumulationTimes(accumulationTimes: CustomTypes.AccumulationTimes) {
-    this._accumulationTimes = accumulationTimes;
-    // TODO:Save
-    //this._db.objects.put('accumulationTimes', this._accumulationTimes);
-    this._db.objects.put({
-      id: 1,
-      categoryNames: this._categoryNames,
-      inputTimes: this._inputTimes,
-      isInputHoliday: this._isInputHoliday,
-      data: this._data,
-      days: this._days,
-      accumulationTimes: this._accumulationTimes
+      days: this._days
     });
   }
 
   public get moduleWeekStrings(): string[] {
     return this._weekStrings;
   }
-  public get moduleCategoryNames(): string[] {
-    return this._categoryNames;
+  public get moduleCategories(): CustomTypes.Category[] {
+    return this._categories;
   }
   public get moduleInputTimes(): CustomTypes.InputTimes {
     return this._inputTimes;
@@ -128,9 +97,6 @@ class DataModule extends VuexModule {
   public get moduleDays(): CustomTypes.MyDays {
     return this._days;
   }
-  public get moduleAccumulationTimes(): CustomTypes.AccumulationTimes {
-    return this._accumulationTimes;
-  }
 
   @Action
   public init(): void {
@@ -142,12 +108,11 @@ class DataModule extends VuexModule {
     this._db.objects.get(1, function(objectData) {
       console.log('objectData', objectData);
       if (objectData) {
-        self.setCategoryNames(objectData.categoryNames);
+        self.setCategories(objectData.categories);
         self.setInputTimes(objectData.inputTimes);
         self.setIsInputHoliday(objectData.isInputHoliday);
         self.setData(objectData.data);
         self.setMyDays(objectData.days);
-        self.setAccumulationTimes(objectData.accumulationTimes);
       } else {
         self.createCalendar(new Date());
       }
@@ -155,21 +120,29 @@ class DataModule extends VuexModule {
   }
 
   @Action
-  public addCategoryName(categoryName: string): void {
-    var newCategoryNames = this._categoryNames.concat(categoryName);
-    this.setCategoryNames(newCategoryNames);
+  public addCategory(categoryName: string): void {
+    var newCategories = this._categories.concat(DataModule.generateCategory(categoryName));
+    this.setCategories(newCategories);
+    var newDays = Object.assign({}, this._days);
+    for (const [key, item] of Object.entries(newDays)) {
+      item.categories[categoryName] = DataModule.generateCategory(categoryName);
+      newDays[key] = item;
+    }
+    this.setMyDays(newDays);
   }
 
   @Action
-  public removeCategoryName(categoryName: string): void {
-    const newCategoryNames = this._categoryNames.filter(name => name != categoryName);
-    this.setCategoryNames(newCategoryNames);
+  public removeCategory(categoryName: string): void {
+    const newCategories = this._categories.filter(category => category.name != categoryName);
+    this.setCategories(newCategories);
+    var newDays = Object.assign({}, this._days);
+    for (const [key, item] of Object.entries(newDays)) {
+      delete item.categories[categoryName];
+      newDays[key] = item;
+    }
+    this.setMyDays(newDays);
   }
 
-  @Action
-  public resetCategoryName(): void {
-    this.setCategoryNames([]);
-  }
   @Action
   public updateIsInputHoliday(isInputHoliday: boolean): void {
     this.setIsInputHoliday(isInputHoliday);
@@ -223,7 +196,7 @@ class DataModule extends VuexModule {
       do {
         console.log('前処理', DataModule.formatDate(dt));
         var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], false);
-        item = DataModule.setCategoryInit(item, this._categoryNames);
+        item = DataModule.setCategoryInit(item, this._categories);
         this.addMyDay(item);
         dt.setDate(dt.getDate() + 1);
       } while (dt.getDay() < firstday);
@@ -232,13 +205,13 @@ class DataModule extends VuexModule {
     // 起点日を指定しそこから終点日までの対象区間データを
     var dt = data.firstDate;
     var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], true);
-    item = DataModule.setCategoryInit(item, this._categoryNames);
+    item = DataModule.setCategoryInit(item, this._categories);
     this.addMyDay(item);
     do {
       dt.setDate(dt.getDate() + 1);
       //console.log(DataModule.formatDate(dt));
       var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], true);
-      item = DataModule.setCategoryInit(item, this._categoryNames);
+      item = DataModule.setCategoryInit(item, this._categories);
       this.addMyDay(item);
     } while (dt < data.lastDate);
 
@@ -248,7 +221,7 @@ class DataModule extends VuexModule {
       do {
         dt.setDate(dt.getDate() + 1);
         var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], false);
-        item = DataModule.setCategoryInit(item, this._categoryNames);
+        item = DataModule.setCategoryInit(item, this._categories);
         this.addMyDay(item);
         console.log('後処理', DataModule.formatDate(dt));
       } while (dt.getDay() < 6);
@@ -268,29 +241,44 @@ class DataModule extends VuexModule {
 
   @Action
   public calc(): void {
-    var planTotalTimeMinutes = this._inputTimes.totalTime.hours * 60;
-    planTotalTimeMinutes += this._inputTimes.totalTime.minutes;
-
-    var totalTimeMinutes = 0;
+    var newInputTimes = Object.assign({}, this._inputTimes);
+    var newCategories = this._categories.concat();
+    newCategories.forEach((c: CustomTypes.Category) => {
+      c.actualTime = DataModule.generateMyTimeByMinutes(0); // リセット
+    });
+    var totalScheduledMinutes = DataModule.getTotalMinutes(this._inputTimes.scheduledTime);
+    var totalActualTime = 0;
     var newDays = Object.assign({}, this._days);
     for (const [key, item] of Object.entries(newDays)) {
-      console.log(key, item.keyDayString, item.date);
+      //console.log(key, item.keyDayString, item.date);
       if (!item.isTarget) {
         continue;
       }
-      totalTimeMinutes += item.planTime.hours * 60;
-      totalTimeMinutes += item.planTime.minutes;
-      var remainingTime = planTotalTimeMinutes - totalTimeMinutes;
-      item.totalTime = DataModule.generateMyTimeByMinutes(totalTimeMinutes);
+      totalActualTime += DataModule.getTotalMinutes(item.scheduledTime);
+      var remainingTime = totalScheduledMinutes - totalActualTime;
+      item.cumulativeTime = DataModule.generateMyTimeByMinutes(totalActualTime);
       item.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
+      newCategories.forEach((c: CustomTypes.Category) => {
+        if (item.categories[c.name].scheduledTime.strHours != '00') {
+          console.log(item.categories[c.name].scheduledTime.strHours);
+        }
+        var cScheduledTime = DataModule.getTotalMinutes(c.scheduledTime);
+        var cActualTime = DataModule.getTotalMinutes(c.actualTime);
+        cActualTime += DataModule.getTotalMinutes(item.categories[c.name].scheduledTime);
+        var cRemainingTime = cScheduledTime - cActualTime;
+        c.actualTime = DataModule.generateMyTimeByMinutes(cActualTime);
+        c.remainingTime = DataModule.generateMyTimeByMinutes(cRemainingTime);
+        item.categories[c.name].actualTime = DataModule.generateMyTimeByMinutes(cActualTime);
+        item.categories[c.name].remainingTime = DataModule.generateMyTimeByMinutes(cRemainingTime);
+      });
       newDays[key] = item;
     }
-    var remainingTime = planTotalTimeMinutes - totalTimeMinutes;
-    var accumulationTimes = DataModule.generateEmptyAccumulationTimes();
-    accumulationTimes.totalTime = DataModule.generateMyTimeByMinutes(totalTimeMinutes);
-    accumulationTimes.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
-    this.setAccumulationTimes(accumulationTimes);
+    var remainingTime = totalScheduledMinutes - totalActualTime;
+    newInputTimes.actualTime = DataModule.generateMyTimeByMinutes(totalActualTime);
+    newInputTimes.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
+    this.setInputTimes(newInputTimes);
     this.setMyDays(newDays);
+    this.setCategories(newCategories);
   }
 
   @Action
@@ -324,14 +312,14 @@ class DataModule extends VuexModule {
           continue;
         }
       }
-      item.planTime = DataModule.generateMyTime(
+      item.scheduledTime = DataModule.generateMyTime(
         this._inputTimes.baseTime.hours,
         this._inputTimes.baseTime.minutes
       );
       console.log(
         item.keyDayString,
-        item.planTime.strHours,
-        item.planTime.strMinutes,
+        item.scheduledTime.strHours,
+        item.scheduledTime.strMinutes,
         item.holidayName
       );
       newDays[key] = item;
@@ -342,8 +330,11 @@ class DataModule extends VuexModule {
   @Action
   public resetTimes(keyDayString: string): void {
     var newDays = Object.assign({}, this._days);
-    newDays[keyDayString].planTime = DataModule.generateMyTime(0, 0);
-    newDays[keyDayString].categoryTimes = [];
+    console.log('resetTimes', keyDayString, newDays[keyDayString]);
+    newDays[keyDayString].scheduledTime = DataModule.generateMyTime(0, 0);
+    this._categories.forEach((c: CustomTypes.Category) => {
+      newDays[keyDayString].categories[c.name] = DataModule.generateCategory(c.name);
+    });
     this.setMyDays(newDays);
     this.calc();
   }
@@ -352,6 +343,10 @@ class DataModule extends VuexModule {
     var newDays = Object.assign({}, this._days);
     newDays[keyDayString].isLock = !newDays[keyDayString].isLock;
     this.setMyDays(newDays);
+  }
+
+  private static getTotalMinutes(time: CustomTypes.MyTime): number {
+    return time.hours * 60 + time.minutes;
   }
 
   private static generateMyDay(dt: Date, week: string, isTarget: boolean): CustomTypes.MyDay {
@@ -366,10 +361,10 @@ class DataModule extends VuexModule {
       isLock: false,
       holidayName: '',
       week: week,
-      planTime: DataModule.generateMyTime(0, 0),
-      totalTime: DataModule.generateMyTime(0, 0),
+      scheduledTime: DataModule.generateMyTime(0, 0),
+      cumulativeTime: DataModule.generateMyTime(0, 0),
       remainingTime: DataModule.generateMyTime(0, 0),
-      categoryTimes: [],
+      categories: {},
       text: ''
     };
 
@@ -378,19 +373,14 @@ class DataModule extends VuexModule {
   private static generateEmptyInputTimes(): CustomTypes.InputTimes {
     const date = new Date();
     return {
-      totalTime: DataModule.generateMyTime(0, 0),
+      scheduledTime: DataModule.generateMyTime(0, 0),
+      actualTime: DataModule.generateMyTime(0, 0),
+      remainingTime: DataModule.generateMyTime(0, 0),
       baseTime: DataModule.generateMyTime(0, 0),
       startDate: date,
       startYear: date.getFullYear(),
       startMonth: date.getMonth() + 1,
       startDay: date.getDate()
-    };
-  }
-
-  private static generateEmptyAccumulationTimes(): CustomTypes.AccumulationTimes {
-    return {
-      totalTime: DataModule.generateMyTime(0, 0),
-      remainingTime: DataModule.generateMyTime(0, 0)
     };
   }
 
@@ -434,12 +424,20 @@ class DataModule extends VuexModule {
 
   private static setCategoryInit(
     item: CustomTypes.MyDay,
-    categoryNames: string[]
+    categories: CustomTypes.Category[]
   ): CustomTypes.MyDay {
-    categoryNames.forEach((weekString: string) => {
-      item.categoryTimes.push(DataModule.generateMyTime(0, 0));
+    categories.forEach((category: CustomTypes.Category) => {
+      item.categories[category.name] = DataModule.generateCategory(category.name);
     });
     return item;
+  }
+  private static generateCategory(name: string): CustomTypes.Category {
+    return {
+      name: name,
+      scheduledTime: DataModule.generateMyTime(0, 0),
+      actualTime: DataModule.generateMyTime(0, 0),
+      remainingTime: DataModule.generateMyTime(0, 0)
+    };
   }
 
   private static formatDate(date: Date): string {

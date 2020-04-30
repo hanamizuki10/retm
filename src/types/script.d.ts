@@ -12,16 +12,14 @@ declare namespace CustomTypes {
   }
 
   export interface InputTimes {
-    totalTime: MyTime;
+    scheduledTime: MyTime;  // 予定時間
+    actualTime: MyTime;     // 実績時間
+    remainingTime: MyTime;  // 残時間
     baseTime: MyTime;
     startDate: Date;
     startYear: number;
     startMonth: number;
     startDay: number;
-  }
-  export interface AccumulationTimes {
-    totalTime: MyTime;
-    remainingTime: MyTime;
   }
   export interface MyMonth {
     firstDate: Date | null;
@@ -42,10 +40,10 @@ declare namespace CustomTypes {
     isLock: boolean;
     holidayName: string;
     week: string;
-    planTime: MyTime;
-    totalTime: MyTime;
-    remainingTime: MyTime;
-    categoryTimes: MyTime[];
+    scheduledTime: MyTime;  // 予定時間
+    cumulativeTime: MyTime; // 累積時間
+    remainingTime: MyTime;  // 累積残時間
+    categories: CategoryIndex;
     text: string;
   }
   export interface MyTime {
@@ -53,5 +51,14 @@ declare namespace CustomTypes {
     strMinutes: string;
     hours: number;
     minutes: number;
+  }
+  export interface CategoryIndex {
+    [name: string]: Category;
+  }
+  export interface Category {
+    name: string;
+    scheduledTime: MyTime;  // 予定時間
+    actualTime: MyTime;     // 実績時間
+    remainingTime: MyTime;  // 残時間
   }
 }

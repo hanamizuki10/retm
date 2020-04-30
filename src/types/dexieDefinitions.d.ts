@@ -11,10 +11,9 @@ export interface AppDatabase extends DexieDatabase {
 /** テーブルの型定義 */
 export interface ICustomer {
   id?: number;
-  categoryNames: string[];
+  categories: CustomTypes.Category[];
   inputTimes: CustomTypes.InputTimes;
   isInputHoliday: boolean;
   data: CustomTypes.MyMonth;
   days: CustomTypes.MyDays;
-  accumulationTimes: CustomTypes.AccumulationTimes;
 }

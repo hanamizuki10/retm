@@ -33,7 +33,7 @@
       </v-container>
       <v-container style="background-color: #efede8;">
         <v-row>
-          <v-col>
+          <v-col class="width130">
             <v-menu
               v-model="datePickerMenu"
               :close-on-content-click="false"
@@ -60,27 +60,23 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <v-col>
+          <v-col class="width130">
             <label class="v-label v-label--active theme--light caption">予定総時間</label><br />
-            <InputTime v-model="totalTime" :limit-length="3" @input="inputTotalTime" />
+            <InputTime v-model="scheduledTime" :limit-length="3" @input="inputTotalTime" />
           </v-col>
-          <v-col>
+          <v-col class="width130">
             <label class="v-label v-label--active theme--light caption">累積総時間</label><br />
-            <InputTime v-model="accumulationInfo.totalTime" />
+            <InputTime v-model="actualTime" readonly />
           </v-col>
-          <v-col>
+          <v-col class="width130">
             <label class="v-label v-label--active theme--light caption">残時間</label><br />
-            <InputTime v-model="accumulationInfo.remainingTime" />
+            <InputTime v-model="remainingTime" readonly />
           </v-col>
-        </v-row>
-        <v-row>
           <v-col>
             <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
             <InputTime v-model="baseTime" @input="inputBaseTime" />
             <v-btn large color="info" @click="autoInput">自動入力</v-btn>
           </v-col>
-        </v-row>
-        <v-row>
           <v-col>
             <input
               type="checkbox"
@@ -90,6 +86,8 @@
             />
             <label for="isInputHoliday">土日祝日も入力モードとする</label>
           </v-col>
+        </v-row>
+        <v-row>
           <v-col>
             <CategoryEdit />
           </v-col>
@@ -129,7 +127,9 @@ export default class App extends Vue {
     calendardata.init();
     this.showHolidays();
   }
-
+  get categories(): CustomTypes.Category[] {
+    return calendardata.moduleCategories;
+  }
   get isInputHoliday(): boolean {
     return calendardata.moduleIsInputHoliday;
   }
@@ -152,11 +152,14 @@ export default class App extends Vue {
   get days(): CustomTypes.MyDays {
     return calendardata.moduleDays;
   }
-  get categoryNames(): string[] {
-    return calendardata.moduleCategoryNames;
+  get scheduledTime(): CustomTypes.MyTime {
+    return calendardata.moduleInputTimes.scheduledTime;
   }
-  get totalTime(): CustomTypes.MyTime {
-    return calendardata.moduleInputTimes.totalTime;
+  get actualTime(): CustomTypes.MyTime {
+    return calendardata.moduleInputTimes.actualTime;
+  }
+  get remainingTime(): CustomTypes.MyTime {
+    return calendardata.moduleInputTimes.remainingTime;
   }
   get baseTime(): CustomTypes.MyTime {
     return calendardata.moduleInputTimes.baseTime;
@@ -170,21 +173,14 @@ export default class App extends Vue {
   get startDay(): number {
     return calendardata.moduleInputTimes.startDay;
   }
-  get accumulationInfo(): CustomTypes.AccumulationTimes {
-    // 累積総時間,累積残時間
-    return calendardata.moduleAccumulationTimes;
-  }
 
   private changeIsInputHoliday(event: Event) {
     calendardata.setIsInputHoliday(!this.isInputHoliday);
   }
   private inputTotalTime(event: Event) {
-    console.log('inputTotalTime-totalTime', this.totalTime.strHours, this.totalTime.strMinutes);
-    console.log('inputTotalTime-baseTime', this.baseTime.strHours, this.baseTime.strMinutes);
     calendardata.calc();
   }
   private inputBaseTime(event: Event) {
-    console.log('inputBaseTime-totalTime', this.totalTime.strHours, this.totalTime.strMinutes);
     console.log('inputBaseTime-baseTime', this.baseTime.strHours, this.baseTime.strMinutes);
   }
 
@@ -270,20 +266,20 @@ export default class App extends Vue {
       });
       str += '\r\n';
       week.days.forEach((day: string) => {
-        str += _this.days[day].planTime.hours + ':' + _this.days[day].planTime.minutes;
+        str += _this.days[day].scheduledTime.hours + ':' + _this.days[day].scheduledTime.minutes;
         str += '\t';
         str += '\t';
         str += '\t';
         str += '\t';
       });
       str += '\r\n';
-      this.categoryNames.forEach((categoryName: string, index: number) => {
+      this.categories.forEach((category: CustomTypes.Category) => {
         week.days.forEach((day: string) => {
           str += '\t';
-          str += categoryName;
+          str += category.name;
           str += '\t';
-          str += _this.days[day].categoryTimes[index].hours;
-          str += ':' + _this.days[day].categoryTimes[index].minutes;
+          str += _this.days[day].categories[category.name].scheduledTime.hours;
+          str += ':' + _this.days[day].categories[category.name].scheduledTime.minutes;
           str += '\t';
           str += '\t';
         });
@@ -294,7 +290,7 @@ export default class App extends Vue {
         str += '\t';
         str += '総時間';
         str += '\t';
-        str += _this.days[day].totalTime.hours + ':' + _this.days[day].totalTime.minutes;
+        str += _this.days[day].cumulativeTime.hours + ':' + _this.days[day].cumulativeTime.minutes;
         str += '\t';
       });
       str += '\r\n';
@@ -334,5 +330,29 @@ export default class App extends Vue {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.width130 {
+  max-width: 130px;
+}
+.primary.test {
+  color: #006400;
+}
+.secondary.test {
+  color: #424242;
+}
+.accent.test {
+  color: #82b1ff;
+}
+.error.test {
+  color: #ff5252;
+}
+.info.test {
+  color: #2196f3;
+}
+.success.test {
+  color: #4caf50;
+}
+.warning.test {
+  color: #ffc107;
 }
 </style>

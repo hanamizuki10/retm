@@ -5,6 +5,7 @@
       class="hours"
       v-model="value.strHours"
       :maxlength="limitLength"
+      :readonly="readonly"
       @input="inputHours"
       @keyup.right="forcusMinutes"
       @click="$refs.r1.select()"
@@ -15,6 +16,7 @@
       class="minutes"
       v-model="value.strMinutes"
       maxlength="2"
+      :readonly="readonly"
       @input="inputMinutes"
       @keyup.left="forcusHours"
       @click="$refs.r2.select()"
@@ -32,6 +34,7 @@ export default class InputTime extends Vue {
   @Prop({ default: 'medium' }) private size!: string;
   //@Prop({ default: 'large' }) private size!: string;
   @Prop({ default: 2 }) private limitLength!: number;
+  @Prop({ default: false }) private readonly: boolean = false;
 
   get refs(): any {
     return this.$refs;

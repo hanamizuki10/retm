@@ -8,14 +8,18 @@
     </v-row>
     <div v-if="isInput">
       <v-row>
-        <v-col class="planTime">
-          <InputTime v-model="item.planTime" size="medium" @input="input" />
+        <v-col class="scheduledTime">
+          <InputTime v-model="item.scheduledTime" size="medium" @input="input" />
         </v-col>
       </v-row>
-      <v-row v-for="(categoryName, index) in categoryNames" :key="categoryName">
+      <v-row v-for="(category, index) in categories" :key="index">
         <v-col class="text-align-center categoryTimes">
-          <label class="caption"> {{ categoryName }} </label>
-          <InputTime v-model="item.categoryTimes[index]" size="small" @input="input" />
+          <label class="caption"> {{ category.name }} </label>
+          <InputTime
+            v-model="item.categories[category.name].scheduledTime"
+            size="small"
+            @input="input"
+          />
         </v-col>
       </v-row>
       <v-row>
@@ -33,7 +37,7 @@
           </div>
           <div></div>
           <div class="d-inline-block caption justify-sm-end" cols="8">
-            総時間 {{ item.totalTime.strHours + ':' + item.totalTime.strMinutes }}<br />
+            総時間 {{ item.cumulativeTime.strHours + ':' + item.cumulativeTime.strMinutes }}<br />
             残時間
             <label :class="cssRemainingTime">
               {{ item.remainingTime.strHours + ':' + item.remainingTime.strMinutes }}
@@ -104,18 +108,8 @@ export default class CalendarCell extends Vue {
     }
     return '';
   }
-  get categoryNames(): string[] {
-    calendardata.moduleCategoryNames.forEach((categoryName: string, index: number) => {
-      if (!this.item.categoryTimes[index]) {
-        this.item.categoryTimes[index] = {
-          strHours: '00',
-          strMinutes: '00',
-          hours: 0,
-          minutes: 0
-        };
-      }
-    });
-    return calendardata.moduleCategoryNames;
+  get categories(): CustomTypes.Category[] {
+    return calendardata.moduleCategories;
   }
 
   get isLockIcon(): string {
@@ -133,7 +127,7 @@ export default class CalendarCell extends Vue {
   private input(event: Event) {
     // 累積時間、残時間の再計算を行う
     calendardata.calc();
-    console.log('this.item.planTime', this.item.planTime);
+    console.log('this.item.scheduledTime', this.item.scheduledTime);
   }
   private lock() {
     console.log('自動入力不可');
@@ -171,7 +165,7 @@ export default class CalendarCell extends Vue {
 table.calendar v-col {
   border: none;
 }
-.planTime div {
+.scheduledTime div {
   min-width: 80px;
 }
 .categoryTimes div {
