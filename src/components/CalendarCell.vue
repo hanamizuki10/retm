@@ -1,10 +1,9 @@
 <template>
   <v-container fluid class="calendar-cell">
     <v-row>
-      <v-col class="text-align-left">
-        <label v-if="item.day === 1" class="caption">{{ item.month }}/</label>
-        {{ item.day }}
-        <label class="font-red caption">{{ item.holidayName }}</label>
+      <v-col class="text-align-left subtitle-2" :class="cssDayRow">
+        <label v-if="item.day === 1" class="overline">{{ item.month }}/</label>{{ item.day }}
+        <label class="overline">{{ aliasName }}</label>
       </v-col>
     </v-row>
     <div v-if="isInput">
@@ -19,21 +18,33 @@
           <InputTime v-model="item.categoryTimes[index]" size="small" @input="input" />
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-text-field v-model="item.text" dense class="caption" @input="input" />
+        </v-col>
+      </v-row>
     </div>
     <div v-if="item.isTarget">
-      <v-row class="d-flex justify-space-between">
-        <v-col>
-          <div v-if="isInput">
+      <v-row>
+        <v-col class="d-flex justify-space-between">
+          <div v-if="isInput" class="d-inline-block justify-sm-start">
             <v-icon size="25" @click="lock" :color="isLockIconColor">{{ isLockIcon }}</v-icon>
             <v-icon size="25" @click="reset">mdi-eraser</v-icon>
           </div>
-          <div class="text-align-right caption">
+          <div></div>
+          <div class="d-inline-block caption justify-sm-end" cols="8">
             総時間 {{ item.totalTime.strHours + ':' + item.totalTime.strMinutes }}<br />
-            残時間 {{ item.remainingTime.strHours + ':' + item.remainingTime.strMinutes }}
+            残時間
+            <label :class="cssRemainingTime">
+              {{ item.remainingTime.strHours + ':' + item.remainingTime.strMinutes }}
+            </label>
           </div>
         </v-col>
       </v-row>
     </div>
+    <v-row>
+      <v-col class="font-red overline">{{ item.holidayName }}</v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -49,7 +60,6 @@ import InputTime from './InputTime.vue';
 })
 export default class CalendarCell extends Vue {
   @Prop() private keyDayString!: string;
-  @Prop() private categoryNames!: String[];
 
   get isInput(): boolean {
     if (!this.item.isTarget) {
@@ -70,6 +80,44 @@ export default class CalendarCell extends Vue {
   get item(): CustomTypes.MyDay {
     return calendardata.moduleDays[this.keyDayString];
   }
+  get aliasName(): string {
+    if ('日' == this.item.week && this.item.isHoliday) {
+      return '法定休日(祝)';
+    } else if ('日' == this.item.week) {
+      return '法定休日';
+    } else if (this.item.isHoliday) {
+      return '祝日';
+    }
+    return '';
+  }
+  get cssDayRow(): string {
+    if ('日' == this.item.week) {
+      return 'font-red';
+    } else if (this.item.isHoliday) {
+      return 'font-red';
+    }
+    return '';
+  }
+  get cssRemainingTime(): string {
+    if (this.item.remainingTime.strHours.startsWith('-')) {
+      return 'font-red';
+    }
+    return '';
+  }
+  get categoryNames(): string[] {
+    calendardata.moduleCategoryNames.forEach((categoryName: string, index: number) => {
+      if (!this.item.categoryTimes[index]) {
+        this.item.categoryTimes[index] = {
+          strHours: '00',
+          strMinutes: '00',
+          hours: 0,
+          minutes: 0
+        };
+      }
+    });
+    return calendardata.moduleCategoryNames;
+  }
+
   get isLockIcon(): string {
     if (this.item.isLock) {
       return 'mdi-lock';

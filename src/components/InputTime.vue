@@ -1,5 +1,5 @@
 <template>
-  <div class="input-time" :class="size">
+  <div class="input-time" :class="cssClass">
     <input
       ref="r1"
       class="hours"
@@ -35,6 +35,16 @@ export default class InputTime extends Vue {
 
   get refs(): any {
     return this.$refs;
+  }
+  get cssClass(): string {
+    var time = this.value.hours + this.value.minutes;
+    if (time === 0) {
+      return this.size; // 未入力
+    } else if (this.value.strHours.startsWith('-')) {
+      return this.size + ' inputerror'; // マイナス値
+    } else {
+      return this.size + ' input'; // 登録値あり
+    }
   }
 
   private inputHours(event: Event) {
@@ -90,7 +100,13 @@ export default class InputTime extends Vue {
   padding: 0px;
   /* border-bottom: 0.5px solid #bbbbbb;*/ /* 下線 */
   display: inline;
+  color: darkgrey;
+}
+.input-time.input {
   color: blue;
+}
+.input-time.inputerror {
+  color: red;
 }
 input {
   margin: 0px;
