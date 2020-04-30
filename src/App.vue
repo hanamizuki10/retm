@@ -11,23 +11,7 @@
     </v-app-bar>
 
     <v-content>
-      <span class="group pa-2">
-        <v-icon color="green darken-2">mdi-calendar-today</v-icon>
-        <v-icon>mdi-event</v-icon>
-        <v-icon>mdi-calendar-today</v-icon>
-        <v-icon>mdi-lock</v-icon>
-        <v-icon>mdi-lock-open</v-icon>
-        <v-icon>mdi-checkbox-marked-circle</v-icon>
-      </span>
-      <v-icon>mdi-calendar-remove</v-icon>
       <v-container>
-        <v-row>
-          <v-col>
-            <div class="text-center">
-              <v-pagination v-model="page" :length="12"></v-pagination>
-            </div>
-          </v-col>
-        </v-row>
         <v-row>
           <v-col>
             <v-btn rounded @click="changeMonth(0)">＜</v-btn>
@@ -47,7 +31,7 @@
           </v-col>
         </v-row>
       </v-container>
-      <v-container>
+      <v-container style="background-color: #efede8;">
         <v-row>
           <v-col>
             <v-menu
@@ -77,25 +61,16 @@
             </v-menu>
           </v-col>
           <v-col>
-            <!-- TODO: 1ヶ月なのか、vs 日数指定 をラジオボタンで -->
-            1ヶ月なのか<br />
-            日数指定なのか
-          </v-col>
-          <v-col>
-            <label class="v-label v-label--active theme--light caption">総時間</label><br />
+            <label class="v-label v-label--active theme--light caption">予定総時間</label><br />
             <InputTime v-model="totalTime" :limit-length="3" @input="inputTotalTime" />
           </v-col>
           <v-col>
-            <label class="v-label v-label--active theme--light caption">累積時間</label><br />
-            <InputTime v-model="accumulationTotalTime" />
+            <label class="v-label v-label--active theme--light caption">累積総時間</label><br />
+            <InputTime v-model="accumulationInfo.totalTime" />
           </v-col>
           <v-col>
             <label class="v-label v-label--active theme--light caption">残時間</label><br />
-            <InputTime v-model="accumulationRemainingTime" />
-          </v-col>
-          <v-spacer></v-spacer>
-          <v-col>
-            <v-btn large color="info" @click="showHolidays">日本の祝日を適用</v-btn>
+            <InputTime v-model="accumulationInfo.remainingTime" />
           </v-col>
         </v-row>
         <v-row>
@@ -114,6 +89,8 @@
               @change="changeIsInputHoliday"
             />
             <label for="isInputHoliday">土日祝日も入力モードとする</label>
+          </v-col>
+          <v-col>
             <CategoryEdit />
           </v-col>
         </v-row>
@@ -149,9 +126,8 @@ export default class App extends Vue {
   }
 
   created() {
-    // 初期値では今日を起点とした日付で情報を表示する
-    const date = new Date(this.startDate);
-    calendardata.createCalendar(date);
+    calendardata.init();
+    this.showHolidays();
   }
 
   get isInputHoliday(): boolean {
@@ -189,20 +165,14 @@ export default class App extends Vue {
     return calendardata.moduleInputTimes.startYear;
   }
   get startMonth(): number {
-    console.log('startMonth', calendardata.moduleInputTimes.startMonth);
     return calendardata.moduleInputTimes.startMonth;
   }
   get startDay(): number {
-    console.log('startDay', calendardata.moduleInputTimes.startDay);
     return calendardata.moduleInputTimes.startDay;
   }
-  get accumulationTotalTime(): CustomTypes.MyTime {
-    console.log('startMonth', calendardata.moduleInputTimes.startMonth);
-    return calendardata.moduleAccumulationTimes.totalTime;
-  }
-
-  get accumulationRemainingTime(): CustomTypes.MyTime {
-    return calendardata.moduleAccumulationTimes.remainingTime;
+  get accumulationInfo(): CustomTypes.AccumulationTimes {
+    // 累積総時間,累積残時間
+    return calendardata.moduleAccumulationTimes;
   }
 
   private changeIsInputHoliday(event: Event) {

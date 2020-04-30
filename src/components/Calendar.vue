@@ -7,7 +7,7 @@
     </v-row>
     <v-row v-for="week in dataweeks" :key="week">
       <v-col v-for="day in week.days" :key="day" :class="cellColor(day)">
-        <CalendarCell :keyDayString="day" :categoryNames="categoryNames" />
+        <CalendarCell :keyDayString="day" />
       </v-col>
     </v-row>
   </v-container>
@@ -29,9 +29,6 @@ export default class Calendar extends Vue {
   }
   get dataweeks(): CustomTypes.MyWeek[] {
     return calendardata.moduleData.weeks;
-  }
-  get categoryNames(): string[] {
-    return calendardata.moduleCategoryNames;
   }
 
   get days(): CustomTypes.MyDays {
@@ -56,20 +53,20 @@ export default class Calendar extends Vue {
 </script>
 
 <style scoped>
-div.calendar div.row {
-  border: solid 1px black;
-}
 div.calendar div.col {
   border: solid 1px black;
   padding: 0px;
+  max-width: 166px;
+  min-width: 166px;
 }
 .not-target {
   background-color: darkgray;
 }
 .saturday {
   background-color: aqua;
+  background-color: rgb(254, 224, 186);
 }
 .sunday {
-  background-color: burlywood;
+  background-color: rgb(254, 224, 186);
 }
 </style>
