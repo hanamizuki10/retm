@@ -121,6 +121,11 @@ class DataModule extends VuexModule {
 
   @Action
   public addCategory(categoryName: string): void {
+    const isCategories = this._categories.filter(category => category.name == categoryName);
+    if (isCategories.length != 0) {
+      // すでに登録されているためこれ以上追加しない。
+      return;
+    }
     var newCategories = this._categories.concat(DataModule.generateCategory(categoryName));
     this.setCategories(newCategories);
     var newDays = Object.assign({}, this._days);
@@ -133,7 +138,9 @@ class DataModule extends VuexModule {
 
   @Action
   public removeCategory(categoryName: string): void {
+    console.log('removeCategory', categoryName, 'categoryName');
     const newCategories = this._categories.filter(category => category.name != categoryName);
+    console.log(newCategories);
     this.setCategories(newCategories);
     var newDays = Object.assign({}, this._days);
     for (const [key, item] of Object.entries(newDays)) {

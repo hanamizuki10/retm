@@ -4,14 +4,11 @@
       <div class="d-flex align-center">
         残業管理くん
       </div>
-
       <v-spacer></v-spacer>
-
       <v-btn large color="info" @click="copy">コピー</v-btn>
     </v-app-bar>
-
     <v-content>
-      <v-container>
+      <v-container fluid class="calendarheader">
         <v-row>
           <v-col>
             <v-btn rounded @click="changeMonth(0)">＜</v-btn>
@@ -30,10 +27,8 @@
             <v-btn rounded @click="changeMonth(13)">＞</v-btn>
           </v-col>
         </v-row>
-      </v-container>
-      <v-container style="background-color: #efede8;">
-        <v-row>
-          <v-col class="width130">
+        <v-row dense style="background-color: #efede8;" justify="start" align="center">
+          <v-col dense class="width130">
             <v-menu
               v-model="datePickerMenu"
               :close-on-content-click="false"
@@ -48,6 +43,7 @@
                   label="毎月の起点日"
                   prepend-icon="mdi-calendar-today"
                   readonly
+                  hide-details
                   v-on="on"
                 ></v-text-field>
               </template>
@@ -60,40 +56,45 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <v-col class="width130">
+          <v-col dense class="width130">
             <label class="v-label v-label--active theme--light caption">予定総時間</label><br />
             <InputTime v-model="scheduledTime" :limit-length="3" @input="inputTotalTime" />
           </v-col>
-          <v-col class="width130">
+          <v-col dense class="width130">
             <label class="v-label v-label--active theme--light caption">累積総時間</label><br />
-            <InputTime v-model="actualTime" readonly />
+            <InputTime v-model="actualTime" :readonly="true" />
           </v-col>
-          <v-col class="width130">
+          <v-col dense class="width130">
             <label class="v-label v-label--active theme--light caption">残時間</label><br />
-            <InputTime v-model="remainingTime" readonly />
+            <InputTime v-model="remainingTime" :readonly="true" />
           </v-col>
-          <v-col>
-            <label class="v-label v-label--active theme--light caption">日々の分割時間目安</label>
+          <v-col dense class="width140">
+            <label class="v-label v-label--active theme--light caption">目安時間の自動入力</label>
+            <br />
             <InputTime v-model="baseTime" @input="inputBaseTime" />
-            <v-btn large color="info" @click="autoInput">自動入力</v-btn>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  class="mx-2"
+                  fab
+                  dark
+                  x-small
+                  depressed
+                  color="accent"
+                  v-on="on"
+                  @click="autoInput"
+                >
+                  <v-icon dark>mdi-pencil</v-icon>
+                </v-btn>
+              </template>
+              <span>自動入力許可されている日付に自動入力する</span>
+            </v-tooltip>
           </v-col>
-          <v-col>
-            <input
-              type="checkbox"
-              id="isInputHoliday"
-              :checked="isInputHoliday"
-              @change="changeIsInputHoliday"
-            />
-            <label for="isInputHoliday">土日祝日も入力モードとする</label>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
+          <v-col dense>
             <CategoryEdit />
           </v-col>
         </v-row>
       </v-container>
-      {{ startYear }}年{{ startMonth }}月
       <Calendar />
     </v-content>
   </v-app>
@@ -118,11 +119,6 @@ export default class App extends Vue {
   private datePickerMenu = false;
   private checkbox = true;
 
-  @Watch('data')
-  private changeCalendardata() {
-    console.log('changeCalendardata');
-  }
-
   created() {
     calendardata.init();
     this.showHolidays();
@@ -130,25 +126,10 @@ export default class App extends Vue {
   get categories(): CustomTypes.Category[] {
     return calendardata.moduleCategories;
   }
-  get isInputHoliday(): boolean {
-    return calendardata.moduleIsInputHoliday;
-  }
 
   get weekStrings(): string[] {
     return calendardata.moduleWeekStrings;
   }
-  get dataweeks(): CustomTypes.MyWeek[] {
-    console.log('dataweeks');
-    console.log(calendardata.moduleData);
-    if (calendardata.moduleData.weeks) {
-      console.log('dataweeks1');
-      return calendardata.moduleData.weeks;
-    } else {
-      console.log('dataweeks2');
-      return [];
-    }
-  }
-
   get days(): CustomTypes.MyDays {
     return calendardata.moduleDays;
   }
@@ -173,9 +154,16 @@ export default class App extends Vue {
   get startDay(): number {
     return calendardata.moduleInputTimes.startDay;
   }
-
-  private changeIsInputHoliday(event: Event) {
-    calendardata.setIsInputHoliday(!this.isInputHoliday);
+  get dataweeks(): CustomTypes.MyWeek[] {
+    console.log('dataweeks');
+    console.log(calendardata.moduleData);
+    if (calendardata.moduleData.weeks) {
+      console.log('dataweeks1');
+      return calendardata.moduleData.weeks;
+    } else {
+      console.log('dataweeks2');
+      return [];
+    }
   }
   private inputTotalTime(event: Event) {
     calendardata.calc();
@@ -193,10 +181,9 @@ export default class App extends Vue {
   }
   private changeMonth(newTargetMonth: number) {
     console.log('changeMonth', newTargetMonth);
-    const nowStartDate = new Date(this.startDate);
-    var targetYear = nowStartDate.getFullYear();
+    var targetYear = this.startYear;
     var targetMonth = newTargetMonth;
-    var targetDate = nowStartDate.getDate();
+    var targetDate = this.startDay;
     if (newTargetMonth === 0) {
       // 前年の12月へ
       targetYear -= 1;
@@ -211,10 +198,12 @@ export default class App extends Vue {
     console.log('切り替え', date);
     calendardata.setStartDate(date);
     this.startDate = date;
+    this.showHolidays();
   }
   private changeDatePicker(date: string) {
     console.log('changeDatePicker', date);
     calendardata.setStartDate(date);
+    this.showHolidays();
   }
 
   private showHolidays() {
@@ -331,11 +320,25 @@ export default class App extends Vue {
   color: #2c3e50;
   margin-top: 60px;
 }
+.calendarheader {
+  max-width: 960px;
+  min-width: 960px;
+  padding: 0px;
+}
 .width130 {
   max-width: 130px;
 }
+.width140 {
+  max-width: 140px;
+}
+.text-align-right {
+  text-align: right;
+}
+.text-align-left {
+  text-align: left;
+}
 .primary.test {
-  color: #006400;
+  color: hsl(250, 100%, 20%);
 }
 .secondary.test {
   color: #424242;

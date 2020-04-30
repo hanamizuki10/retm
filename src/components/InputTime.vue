@@ -45,6 +45,8 @@ export default class InputTime extends Vue {
       return this.size; // 未入力
     } else if (this.value.strHours.startsWith('-')) {
       return this.size + ' inputerror'; // マイナス値
+    } else if (this.readonly) {
+      return this.size + ' readonly'; // readonlyあり
     } else {
       return this.size + ' input'; // 登録値あり
     }
@@ -101,12 +103,14 @@ export default class InputTime extends Vue {
 .input-time {
   margin: 0px;
   padding: 0px;
-  /* border-bottom: 0.5px solid #bbbbbb;*/ /* 下線 */
   display: inline;
   color: darkgrey;
 }
 .input-time.input {
   color: blue;
+}
+.input-time.readonly {
+  color: black;
 }
 .input-time.inputerror {
   color: red;
