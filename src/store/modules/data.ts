@@ -363,7 +363,6 @@ class DataModule extends VuexModule {
       day: dt.getDate(),
       keyDayString: this.formatDate(dt),
       isTarget: isTarget,
-      isCurrent: this.isToday(dt),
       isHoliday: false,
       isLock: false,
       holidayName: '',
@@ -447,15 +446,11 @@ class DataModule extends VuexModule {
     };
   }
 
-  private static formatDate(date: Date): string {
+  public static formatDate(date: Date): string {
     var targetYear = date.getFullYear();
     var targetMonth = date.getMonth() + 1;
     var targetDate = date.getDate();
     return targetYear + '/' + ('00' + targetMonth).slice(-2) + '/' + ('00' + targetDate).slice(-2);
-  }
-  private static isToday(dt: Date): boolean {
-    const _today: Date = new Date(Date.now());
-    return this.formatDate(dt) === this.formatDate(_today);
   }
 }
 export default getModule(DataModule);

@@ -22,26 +22,9 @@
         <CalendarCell :keyDayString="day" />
       </v-col>
     </v-row>
-    <v-row class="subfooter">
-      <v-col dense class="width130 text-align-left">
-        <label class="v-label v-label--active theme--light caption">累積総時間</label><br />
-        <InputTime v-model="actualTime" :readonly="true" />
-      </v-col>
-      <v-col dense class="width130 text-align-left">
-        <label class="v-label v-label--active theme--light caption">残時間</label><br />
-        <InputTime v-model="remainingTime" :readonly="true" />
-      </v-col>
-    </v-row>
-    <v-row class="subfooter" v-for="(category, index) in categories" :key="index">
-      <v-col dense class="width130 text-align-left">
-        <label class="v-label v-label--active theme--light caption">”{{ category.name }}”</label>
-        <label class="v-label v-label--active theme--light caption">の累積総時間</label><br />
-        <InputTime v-model="category.actualTime" :readonly="true" />
-      </v-col>
-      <v-col dense class="width130 text-align-left">
-        <label class="v-label v-label--active theme--light caption">”{{ category.name }}”</label>
-        <label class="v-label v-label--active theme--light caption">の残時間</label><br />
-        <InputTime v-model="category.remainingTime" :readonly="true" />
+    <v-row>
+      <v-col>
+        <ResultTable />
       </v-col>
     </v-row>
   </v-container>
@@ -52,11 +35,13 @@ import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
 import calendardata from '../store/modules/data';
 import CalendarCell from './CalendarCell.vue';
 import InputTime from './InputTime.vue';
+import ResultTable from './ResultTable.vue';
 
 @Component({
   components: {
     CalendarCell,
-    InputTime
+    InputTime,
+    ResultTable
   }
 })
 export default class Calendar extends Vue {
@@ -104,10 +89,21 @@ export default class Calendar extends Vue {
       return 'holiday';
     }
     // 本日
-    if (this.days[keyDayString].isCurrent) {
+    if (this.isToday(keyDayString)) {
       return 'today';
     }
     return '';
+  }
+
+  private isToday(keyDayString: string): boolean {
+    const _today: Date = new Date(Date.now());
+    const targetYear = _today.getFullYear();
+    const targetMonth = _today.getMonth() + 1;
+    const targetDate = _today.getDate();
+    const _todayString =
+      targetYear + '/' + ('00' + targetMonth).slice(-2) + '/' + ('00' + targetDate).slice(-2);
+
+    return keyDayString === _todayString;
   }
 }
 </script>
