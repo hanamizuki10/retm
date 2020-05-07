@@ -10,7 +10,6 @@ describe('CalendarCell.vue', () => {
       day: 1,
       keyDayString: '2020-01-01',
       isTarget: false,
-      isCurrent: false,
       isHoliday: false, // TODO
       isLock: false,
       holidayName: '', // TODO

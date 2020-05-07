@@ -35,7 +35,6 @@ declare namespace CustomTypes {
     day: number;
     keyDayString: string;
     isTarget: boolean;
-    isCurrent: boolean;
     isHoliday: boolean;
     isLock: boolean;
     holidayName: string;

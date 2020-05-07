@@ -5,7 +5,9 @@
         残業管理くん
       </div>
       <v-spacer></v-spacer>
+      <!-- 
       <v-btn large color="info" @click="copy">コピー</v-btn>
+      -->
     </v-app-bar>
     <v-content>
       <v-container fluid class="calendarheader">
