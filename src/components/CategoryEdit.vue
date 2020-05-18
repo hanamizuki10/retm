@@ -28,7 +28,12 @@
                 </v-list-item-content>
                 <v-list-item-content>
                   <label class="v-label v-label--active theme--light caption">予定総時間</label>
-                  <InputTime v-model="category.scheduledTime" @input="input" size="small" />
+                  <InputTime
+                    v-model="category.scheduledTime"
+                    :limit-length="3"
+                    @input="input"
+                    size="small"
+                  />
                 </v-list-item-content>
                 <v-list-item-content>
                   <label class="v-label v-label--active theme--light caption">累積総時間</label>
