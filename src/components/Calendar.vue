@@ -1,7 +1,9 @@
 <template>
   <v-container class="calendar">
     <v-row class="subheader" align="center" align-content="center" justify="space-between">
-      <v-col cols="3" class="text-align-left title">{{ startYear }}年{{ startMonth }}月</v-col>
+      <v-col cols="3" class="text-align-left title font-weight-bold">
+        {{ startYear }}年{{ startMonth }}月
+      </v-col>
       <v-col cols="9" dense class="text-align-right caption">
         <input
           type="checkbox"
