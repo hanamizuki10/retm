@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar app color="primary" dark>
       <div class="d-flex align-center">
-        残業管理くん
+        残業時間管理くん ~ Remaining time management (ReTM) ~
       </div>
       <v-spacer></v-spacer>
       <!-- 
@@ -89,7 +89,11 @@
                   <v-icon dark>mdi-pencil</v-icon>
                 </v-btn>
               </template>
-              <span>自動入力許可されている日付に自動入力する</span>
+              <span>
+                自動入力許可されている日付
+                <v-icon size="25" color="lime lighten-4">mdi-lock-open</v-icon>
+                に自動入力する
+              </span>
             </v-tooltip>
           </v-col>
           <v-col dense>
@@ -99,6 +103,7 @@
       </v-container>
       <Calendar />
     </v-content>
+    Copyright © 2020 Mizuki Hanabatake
   </v-app>
 </template>
 
