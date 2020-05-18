@@ -106,7 +106,7 @@ class DataModule extends VuexModule {
     this._db.open();
     var self = this;
     this._db.objects.get(1, function(objectData) {
-      console.log('objectData', objectData);
+      //console.log('objectData', objectData);
       if (objectData) {
         self.setCategories(objectData.categories);
         self.setInputTimes(objectData.inputTimes);
@@ -138,9 +138,9 @@ class DataModule extends VuexModule {
 
   @Action
   public removeCategory(categoryName: string): void {
-    console.log('removeCategory', categoryName, 'categoryName');
+    //console.log('removeCategory', categoryName, 'categoryName');
     const newCategories = this._categories.filter(category => category.name != categoryName);
-    console.log(newCategories);
+    //console.log(newCategories);
     this.setCategories(newCategories);
     var newDays = Object.assign({}, this._days);
     for (const [key, item] of Object.entries(newDays)) {
@@ -184,7 +184,7 @@ class DataModule extends VuexModule {
   public createCalendar(date: Date): void {
     // リセット
     this.resetData();
-    console.log(DataModule.formatDate(date));
+    //console.log(DataModule.formatDate(date));
     var targetYear = date.getFullYear();
     var targetMonth = date.getMonth() + 1;
     var targetDate = date.getDate();
@@ -201,14 +201,14 @@ class DataModule extends VuexModule {
       var dt = data.firstDate;
       dt.setDate(dt.getDate() - firstday);
       do {
-        console.log('前処理', DataModule.formatDate(dt));
+        //console.log('前処理', DataModule.formatDate(dt));
         var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], false);
         item = DataModule.setCategoryInit(item, this._categories);
         this.addMyDay(item);
         dt.setDate(dt.getDate() + 1);
       } while (dt.getDay() < firstday);
     }
-    console.log('pre----', firstday);
+    //console.log('pre----', firstday);
     // 起点日を指定しそこから終点日までの対象区間データを
     var dt = data.firstDate;
     var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], true);
@@ -222,7 +222,7 @@ class DataModule extends VuexModule {
       this.addMyDay(item);
     } while (dt < data.lastDate);
 
-    console.log('post----', lastday);
+    //console.log('post----', lastday);
     if (lastday < 6) {
       var dt = data.lastDate;
       do {
@@ -230,7 +230,7 @@ class DataModule extends VuexModule {
         var item = DataModule.generateMyDay(dt, this._weekStrings[dt.getDay()], false);
         item = DataModule.setCategoryInit(item, this._categories);
         this.addMyDay(item);
-        console.log('後処理', DataModule.formatDate(dt));
+        //console.log('後処理', DataModule.formatDate(dt));
       } while (dt.getDay() < 6);
     }
 
@@ -243,7 +243,7 @@ class DataModule extends VuexModule {
       }
     }
     this.setData(data);
-    console.log('end', data);
+    //console.log('end', data);
   }
 
   @Action
@@ -267,7 +267,7 @@ class DataModule extends VuexModule {
       item.remainingTime = DataModule.generateMyTimeByMinutes(remainingTime);
       newCategories.forEach((c: CustomTypes.Category) => {
         if (item.categories[c.name].scheduledTime.strHours != '00') {
-          console.log(item.categories[c.name].scheduledTime.strHours);
+          //console.log(item.categories[c.name].scheduledTime.strHours);
         }
         var cScheduledTime = DataModule.getTotalMinutes(c.scheduledTime);
         var cActualTime = DataModule.getTotalMinutes(c.actualTime);
@@ -290,20 +290,20 @@ class DataModule extends VuexModule {
 
   @Action
   public setStartDate(date: string): void {
-    console.log('setStartDate', date);
+    //console.log('setStartDate', date);
     var newInputTimes = Object.assign({}, this._inputTimes);
     newInputTimes.startDate = new Date(date);
     newInputTimes.startYear = newInputTimes.startDate.getFullYear();
     newInputTimes.startMonth = newInputTimes.startDate.getMonth() + 1;
     newInputTimes.startDay = newInputTimes.startDate.getDate();
-    console.log('newInputTimes', newInputTimes);
+    //console.log('newInputTimes', newInputTimes);
     this.setInputTimes(newInputTimes);
     this.createCalendar(newInputTimes.startDate);
   }
 
   @Action
   public setAutoPlanTime(): void {
-    console.log('setAutoPlanTime', this._inputTimes.baseTime);
+    //console.log('setAutoPlanTime', this._inputTimes.baseTime);
     var newDays = Object.assign({}, this._days);
     for (const [key, item] of Object.entries(newDays)) {
       if (!item.isTarget) {
@@ -323,12 +323,12 @@ class DataModule extends VuexModule {
         this._inputTimes.baseTime.hours,
         this._inputTimes.baseTime.minutes
       );
-      console.log(
+      /*console.log(
         item.keyDayString,
         item.scheduledTime.strHours,
         item.scheduledTime.strMinutes,
         item.holidayName
-      );
+      );*/
       newDays[key] = item;
     }
     this.setMyDays(newDays);
@@ -337,7 +337,7 @@ class DataModule extends VuexModule {
   @Action
   public resetTimes(keyDayString: string): void {
     var newDays = Object.assign({}, this._days);
-    console.log('resetTimes', keyDayString, newDays[keyDayString]);
+    //console.log('resetTimes', keyDayString, newDays[keyDayString]);
     newDays[keyDayString].scheduledTime = DataModule.generateMyTime(0, 0);
     this._categories.forEach((c: CustomTypes.Category) => {
       newDays[keyDayString].categories[c.name] = DataModule.generateCategory(c.name);
