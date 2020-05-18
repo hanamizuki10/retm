@@ -60,4 +60,10 @@ declare namespace CustomTypes {
     actualTime: MyTime;     // 実績時間
     remainingTime: MyTime;  // 残時間
   }
+  export interface CategoryDisp {
+    name: string;
+    scheduledTime: string;  // 予定時間
+    actualTime: string;     // 実績時間
+    remainingTime: string;  // 残時間
+  }
 }

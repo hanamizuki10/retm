@@ -24,8 +24,8 @@ export default class ResultTable extends Vue {
   get categories(): CustomTypes.Category[] {
     return calendardata.moduleCategories;
   }
-  get times(): any {
-    var data = [];
+  get times(): CustomTypes.CategoryDisp[] {
+    var data: CustomTypes.CategoryDisp[] = [];
     this.categories.forEach((category: CustomTypes.Category) => {
       data.push({
         name: category.name,
