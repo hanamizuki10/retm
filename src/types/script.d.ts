@@ -12,9 +12,9 @@ declare namespace CustomTypes {
   }
 
   export interface InputTimes {
-    scheduledTime: MyTime;  // 予定時間
-    actualTime: MyTime;     // 実績時間
-    remainingTime: MyTime;  // 残時間
+    scheduledTime: MyTime; // 予定時間
+    actualTime: MyTime; // 実績時間
+    remainingTime: MyTime; // 残時間
     baseTime: MyTime;
     startDate: Date;
     startYear: number;
@@ -39,9 +39,9 @@ declare namespace CustomTypes {
     isLock: boolean;
     holidayName: string;
     week: string;
-    scheduledTime: MyTime;  // 予定時間
+    scheduledTime: MyTime; // 予定時間
     cumulativeTime: MyTime; // 累積時間
-    remainingTime: MyTime;  // 累積残時間
+    remainingTime: MyTime; // 累積残時間
     categories: CategoryIndex;
     text: string;
   }
@@ -56,14 +56,14 @@ declare namespace CustomTypes {
   }
   export interface Category {
     name: string;
-    scheduledTime: MyTime;  // 予定時間
-    actualTime: MyTime;     // 実績時間
-    remainingTime: MyTime;  // 残時間
+    scheduledTime: MyTime; // 予定時間
+    actualTime: MyTime; // 実績時間
+    remainingTime: MyTime; // 残時間
   }
   export interface CategoryDisp {
     name: string;
-    scheduledTime: string;  // 予定時間
-    actualTime: string;     // 実績時間
-    remainingTime: string;  // 残時間
+    scheduledTime: string; // 予定時間
+    actualTime: string; // 実績時間
+    remainingTime: string; // 残時間
   }
 }
