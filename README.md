@@ -15,16 +15,7 @@ https://note.com/copipetech/n/nd33728da46b0
  - TypeScript
  - Indexed Database API
 
-#### 事前準備ファイル
-指定のGASへデータを転送するために、事前にGASファイルを作成する必要がある。
-プロジェクトルートディレクトリ直下に `.clasp.json` ファイルを作成して格納する。
-```
-{
-  "scriptId": "作成したGASのスクリプトIDをここに記載する",
-  "rootDir": "dist"
-}
 
-```
 ## セットアップ
 ```
 npm install
@@ -61,7 +52,22 @@ npm run lint
 npm run test:unit
 ```
 
+#### GASのアップロード(事前準備)
+GAS のGoogle謹製CLIツール claspがインストールされている前提。
+事前にログインする。
+```
+clasp login
+```
 
+その後、指定のGASへデータを転送する宛先として、GASファイルを事前に作成する必要がある。
+その後、プロジェクトルートディレクトリ直下に `.clasp.json` ファイルを作成して格納する。
+```
+{
+  "scriptId": "作成したGASのスクリプトIDをここに記載する",
+  "rootDir": "dist"
+}
+
+```
 ### GASのアップロード
 ```
 npm run push
