@@ -3,7 +3,6 @@ import CalendarCell from '@/components/CalendarCell.vue';
 
 describe('CalendarCell.vue', () => {
   it('renders props.msg when passed', () => {
-
     const data: CustomTypes.MyDay = {
       date: new Date(2020, 0, 1),
       month: 1,
