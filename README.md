@@ -1,9 +1,11 @@
 # 残時間管理くん(Remaining time management)
-通称：ReTM(レテム）
+通称：ReTM(レテム）くん
 
 月の定められた業務時間の残り時間をカンレダーベースで管理するツール
+vueとnodeとgasの勉強がてらに作ったツールです。
 
 詳細は以下記事にて記載
+
 https://note.com/copipetech/n/nd33728da46b0
 
 #### 使用技術
